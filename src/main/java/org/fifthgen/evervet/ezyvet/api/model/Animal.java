@@ -10,7 +10,7 @@ public class Animal {
 
     private Long id;
 
-    private Boolean active;
+    private Integer active;
 
     @JsonProperty("created_at")
     private Date createdAt;
@@ -26,10 +26,10 @@ public class Animal {
     private Integer sexId;
 
     @JsonProperty("is_dead")
-    private Boolean isDead;
+    private Integer isDead;
 
     @JsonProperty("is_hostile")
-    private Boolean isHostile;
+    private Integer isHostile;
 
     @JsonProperty("animalcolour_id")
     private Integer animalColourId;
@@ -56,7 +56,7 @@ public class Animal {
     private Date dateOfBirth;
 
     @JsonProperty("is_estimated_date_of_birth")
-    private Boolean isEstimatedDateOfBirth;
+    private Integer isEstimatedDateOfBirth;
 
     @JsonProperty("date_of_death")
     private Date dateOfDeath;
@@ -81,12 +81,12 @@ public class Animal {
     @JsonProperty("weight_unit")
     private String weightUnit;
 
-    private Boolean resuscitate;
+    private Integer resuscitate;
 
     private String notes;
 
     @JsonProperty("notes_important")
-    private Boolean notesImportant;
+    private Integer notesImportant;
 
     private String guid;
 }
