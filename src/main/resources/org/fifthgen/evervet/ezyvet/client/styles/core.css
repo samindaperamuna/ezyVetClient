@@ -1,0 +1,40 @@
+.status-bar {
+    -fx-pref-height: 30px;
+    -fx-border-insets: 0;
+    -fx-border-color: -fx-text-box-border;
+    -fx-border-width: 1 0 0 0;
+}
+
+.bordered-panel {
+    -fx-border-insets: 10;
+    -fx-border-color: -fx-text-box-border;
+    -fx-border-width: 1;
+}
+
+.net-stat-label, .online, .offline{
+    -fx-font-size: 12px;
+    -fx-text-fill: 'white';
+}
+
+.online {
+    -fx-background-color: 'green';
+}
+
+.offline {
+    -fx-background-color: 'red';
+}
+
+.table-cell-center {
+    -fx-alignment: center;
+}
+
+.error-label {
+    -fx-text-fill: 'red';
+}
+
+.title-label {
+    -fx-background-color: '#000';
+    -fx-text-fill: '#FFF';
+    -fx-font-size: 16px;
+    -fx-padding: 10px;
+}
