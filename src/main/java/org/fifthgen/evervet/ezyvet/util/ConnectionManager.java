@@ -9,11 +9,18 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.fifthgen.evervet.ezyvet.api.callback.ConnectCallback;
+import org.fifthgen.evervet.ezyvet.api.model.exception.BadRequestException;
+import org.fifthgen.evervet.ezyvet.api.model.exception.NotFoundException;
+import org.fifthgen.evervet.ezyvet.api.model.exception.RequestCancelledException;
+import org.fifthgen.evervet.ezyvet.api.model.exception.UnauthorizedException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class ConnectionManager {
@@ -21,10 +28,13 @@ public class ConnectionManager {
     private static final int TIMEOUT = 2000;
     private static ConnectionManager instance;
 
+    private final Logger log;
+
     /**
      * Private constructor ensures the instantiation of this class remains singleton.
      */
     private ConnectionManager() {
+        this.log = Logger.getLogger(getClass().getName());
     }
 
     /**
@@ -73,9 +83,9 @@ public class ConnectionManager {
      * Returns a <code>{@link HttpResponse}</code> as a <code>{@link FutureCallback}</code>.
      *
      * @param request  The request object that needs executing.
-     * @param callback <code>{@link FutureCallback}</code> containing the response.
+     * @param callback <code>{@link ConnectCallback}</code> containing the response.
      */
-    public void connect(HttpUriRequest request, FutureCallback<HttpResponse> callback) {
+    public void connect(HttpUriRequest request, ConnectCallback callback) {
         SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
 
         try {
@@ -85,8 +95,49 @@ public class ConnectionManager {
                     .setSSLContext(sslContextBuilder.build())
                     .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                     .build()) {
+                CountDownLatch latch = new CountDownLatch(1);
                 client.start();
-                client.execute(request, callback).get();
+                client.execute(request, new FutureCallback<>() {
+                    @Override
+                    public void completed(HttpResponse response) {
+                        switch (response.getStatusLine().getStatusCode()) {
+                            case 200:
+                                log.fine("200 - Success");
+                                callback.onCompleted(response, latch);
+
+                                break;
+                            case 400:
+                                log.severe("400 - Bad request");
+                                callback.onFailed(new BadRequestException(), latch);
+
+                                break;
+                            case 401:
+                                log.severe("401 - Unauthorized");
+                                callback.onFailed(new UnauthorizedException(), latch);
+
+                                break;
+                            case 404:
+                                log.severe("404 - Not found");
+                                callback.onFailed(new NotFoundException(), latch);
+
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void failed(Exception e) {
+                        log.severe("Exception in request: \n" + e.getLocalizedMessage());
+                        callback.onFailed(e, latch);
+                    }
+
+                    @Override
+                    public void cancelled() {
+                        log.severe("Request cancelled");
+                        callback.onFailed(new RequestCancelledException(), latch);
+                    }
+                });
+
+                latch.await(30, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
             Logger.getGlobal().severe("Couldn't execute the request using the AsyncClient.");

@@ -1,8 +1,11 @@
 package org.fifthgen.evervet.ezyvet.api;
 
+import org.fifthgen.evervet.ezyvet.TestContext;
 import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalsListCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetTokenCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
+import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.Token;
 import org.fifthgen.evervet.ezyvet.api.model.TokenScope;
 import org.junit.Assert;
@@ -20,10 +23,14 @@ public class APIV1Test {
     public final ExpectedException exception = ExpectedException.none();
 
     private APIV1 api;
+    private TestContext testContext;
 
     @Before
     public void setUp() {
         this.api = new APIV1();
+
+        testContext = new TestContext();
+        testContext.init();
     }
 
     @Test
@@ -32,13 +39,13 @@ public class APIV1Test {
             @Override
             public void onCompleted(Token token) {
                 Assert.assertNotNull(token);
-                System.out.println(token.toString());
+                testContext.log.info("Fetched token complete: " + token.toString());
             }
 
             @Override
             public void onFailed(Exception e) {
                 exception.expect(Exception.class);
-                e.printStackTrace();
+                testContext.log.severe("Failed to fetch the token: " + e.getLocalizedMessage());
             }
         });
     }
@@ -49,13 +56,30 @@ public class APIV1Test {
             @Override
             public void onCompleted(List<Animal> animalList) {
                 Assert.assertNotNull(animalList);
-                System.out.println(Arrays.toString(animalList.toArray()));
+                testContext.log.info("Fetch animals list complete : " + Arrays.toString(animalList.toArray()));
             }
 
             @Override
             public void onFailed(Exception e) {
                 exception.expect(Exception.class);
-                e.printStackTrace();
+                testContext.log.severe("Failed to fetch animals list: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getContactTest() {
+        api.getContact(24, new GetContactCallback() {
+            @Override
+            public void onCompleted(Contact contact) {
+                Assert.assertNotNull(contact);
+                testContext.log.info("Fetch contact complete : " + contact.toString());
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch contact: " + e.getLocalizedMessage());
             }
         });
     }
