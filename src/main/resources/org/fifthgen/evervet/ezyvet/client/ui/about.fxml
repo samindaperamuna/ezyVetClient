@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="pane"
+            xmlns="http://javafx.com/javafx/10.0.2-internal">
+    <stylesheets>
+        <URL value="@styles/about.css"/>
+    </stylesheets>
+    <ImageView fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" styleClass="logo"
+               AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+
+        <Image url="@images/logo.png"/>
+
+    </ImageView>
+    <Label styleClass="title" text="Evervet - ezyVet Client" underline="true" AnchorPane.leftAnchor="100.0"
+           AnchorPane.topAnchor="35.0"/>
+    <Label alignment="TOP_LEFT" styleClass="content"
+           text="This software is a third party client for the ezyVet API. It allows the user to query surgery appointments and generate the necessary X-RAY and DICOM server documents."
+           textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
+           AnchorPane.topAnchor="80.0"/>
+    <Label styleClass="footer" text="Copyright © 2020, Evervet Veterinary Hospital" AnchorPane.leftAnchor="20.0"
+           AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="165.0"/>
+</AnchorPane>

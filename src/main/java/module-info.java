@@ -8,10 +8,12 @@ module ezyVet.Client.Evervet {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
+    requires org.kordamp.ikonli.javafx;
     requires static lombok;
 
     exports org.fifthgen.evervet.ezyvet.client;
+    exports org.fifthgen.evervet.ezyvet.api;
 
-    opens org.fifthgen.evervet.ezyvet.client to javafx.fxml;
+    opens org.fifthgen.evervet.ezyvet.client.ui to javafx.fxml;
     opens org.fifthgen.evervet.ezyvet.api.model to com.fasterxml.jackson.databind;
 }
