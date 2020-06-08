@@ -10,10 +10,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.fifthgen.evervet.ezyvet.api.callback.*;
-import org.fifthgen.evervet.ezyvet.api.model.Animal;
-import org.fifthgen.evervet.ezyvet.api.model.Contact;
-import org.fifthgen.evervet.ezyvet.api.model.Token;
-import org.fifthgen.evervet.ezyvet.api.model.TokenScope;
+import org.fifthgen.evervet.ezyvet.api.model.*;
 import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
 import org.fifthgen.evervet.ezyvet.util.PropertyManager;
@@ -34,6 +31,7 @@ public class APIV1 {
     private static final String AUTHENTICATION = "/oauth/access_token";
     private static final String ANIMAL = "/animal";
     private static final String CONTACT = "/contact";
+    private static final String APPOINTMENT_TYPE = "/appointmenttype";
 
     public APIV1() {
         log = Logger.getLogger(getClass().getName());
@@ -115,7 +113,7 @@ public class APIV1 {
         });
     }
 
-    public void getAnimalsList(GetAnimalsListCallback callback) {
+    public void getAnimalList(GetAnimalListCallback callback) {
         final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + BASE + ANIMAL);
         setUpRequestHeaders(TokenScope.READ_ANIMAL, new HeadersSetUpCallback() {
             @Override
@@ -187,6 +185,52 @@ public class APIV1 {
                             callback.onCompleted(contacts.get(0));
                         } catch (IOException e) {
                             String msg = "Couldn't convert response into a contact object.";
+                            log.severe(msg + ": \n" + e.getLocalizedMessage());
+                            callback.onFailed(e);
+                        } finally {
+                            latch.countDown();
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
+                        callback.onFailed(e);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Failed to fetch request headers : " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getAppointmentTypeList(GetAppointmentTypeListCallback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + BASE + APPOINTMENT_TYPE);
+        setUpRequestHeaders(TokenScope.READ_APPOINTMENT_TYPE, new HeadersSetUpCallback() {
+            @Override
+            public void onCompleted(Header[] headers) {
+                getRequest.setHeaders(headers);
+                ConnectionManager connectionManager = ConnectionManager.getInstance();
+                connectionManager.connect(getRequest, new ConnectCallback() {
+                    @Override
+                    public void onCompleted(HttpResponse response, CountDownLatch latch) {
+                        HttpEntity entity = response.getEntity();
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        try {
+                            JsonNode node = mapper.readTree(EntityUtils.toString(entity));
+                            JsonNode itemsNode = node.path("items");
+
+                            List<AppointmentType> appointmentTypes = new ArrayList<>();
+                            for (JsonNode itemNode : itemsNode) {
+                                appointmentTypes.add(mapper.readerFor(AppointmentType.class).readValue(itemNode.get("appointmenttype")));
+                            }
+
+                            callback.onCompleted(appointmentTypes);
+                        } catch (IOException e) {
+                            String msg = "Couldn't convert response into a list of  appointment types.";
                             log.severe(msg + ": \n" + e.getLocalizedMessage());
                             callback.onFailed(e);
                         } finally {

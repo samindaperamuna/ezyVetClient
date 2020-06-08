@@ -1,13 +1,11 @@
 package org.fifthgen.evervet.ezyvet.api;
 
 import org.fifthgen.evervet.ezyvet.TestContext;
-import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalsListCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalListCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentTypeListCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetTokenCallback;
-import org.fifthgen.evervet.ezyvet.api.model.Animal;
-import org.fifthgen.evervet.ezyvet.api.model.Contact;
-import org.fifthgen.evervet.ezyvet.api.model.Token;
-import org.fifthgen.evervet.ezyvet.api.model.TokenScope;
+import org.fifthgen.evervet.ezyvet.api.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,7 +50,7 @@ public class APIV1Test {
 
     @Test
     public void getAnimalsListTest() {
-        api.getAnimalsList(new GetAnimalsListCallback() {
+        api.getAnimalList(new GetAnimalListCallback() {
             @Override
             public void onCompleted(List<Animal> animalList) {
                 Assert.assertNotNull(animalList);
@@ -80,6 +78,23 @@ public class APIV1Test {
             public void onFailed(Exception e) {
                 exception.expect(Exception.class);
                 testContext.log.severe("Failed to fetch contact: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getAppointmentTypeListTest() {
+        api.getAppointmentTypeList(new GetAppointmentTypeListCallback() {
+            @Override
+            public void onCompleted(List<AppointmentType> appointmentTypes) {
+                Assert.assertNotNull(appointmentTypes);
+                testContext.log.info("Fetch appointment type list complete : " + Arrays.toString(appointmentTypes.toArray()));
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch appointment type list : " + e.getLocalizedMessage());
             }
         });
     }
