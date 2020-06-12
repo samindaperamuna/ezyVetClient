@@ -7,7 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,6 +21,7 @@ import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -33,7 +36,13 @@ public class MainController implements Initializable {
     public Stage stage;
 
     @FXML
+    private DatePicker appointmentDatePicker;
+
+    @FXML
     private ComboBox<AppointmentType> appointmentTypeCombo;
+
+    @FXML
+    private Button searchButton;
 
     @FXML
     private Label errorLabel;
@@ -50,6 +59,8 @@ public class MainController implements Initializable {
     }
 
     private void fetchAppointmentTypes() {
+        errorLabel.setText("Fetching appointment types. Please wait!");
+
         new Thread(() -> {
             APIV1 api = new APIV1();
             api.getAppointmentTypeList(new GetAppointmentTypeListCallback() {
@@ -58,6 +69,7 @@ public class MainController implements Initializable {
                     Platform.runLater(() -> {
                         appointmentTypeCombo.setItems(FXCollections.observableList(appointmentTypeList));
                         appointmentTypeCombo.getSelectionModel().selectFirst();
+                        errorLabel.setText(null);
                     });
                 }
 
@@ -79,7 +91,7 @@ public class MainController implements Initializable {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("about.fxml"));
 
         try {
-            // Load and getOrders the preference controller.
+            // Load and getOrders the about controller.
             Parent root = loader.load();
 
             Stage aboutStage = new Stage();
@@ -92,6 +104,12 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             Logger.getGlobal().severe("Couldn't load FXML file: " + e.getLocalizedMessage());
         }
+    }
+
+    @FXML
+    private void onSearchAction() {
+        LocalDate appointmentDate = appointmentDatePicker.getValue();
+
     }
 
     private class NetStatUpdater implements Runnable {

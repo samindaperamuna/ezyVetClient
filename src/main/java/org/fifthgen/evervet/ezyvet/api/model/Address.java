@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 public class Address {
@@ -14,10 +14,10 @@ public class Address {
     private Integer active;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private Instant createdAt;
 
     @JsonProperty("modified_at")
-    private Date modifiedAt;
+    private Instant modifiedAt;
 
     private String name;
 

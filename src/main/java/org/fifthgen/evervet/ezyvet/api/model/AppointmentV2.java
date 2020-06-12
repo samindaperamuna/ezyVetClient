@@ -3,7 +3,7 @@ package org.fifthgen.evervet.ezyvet.api.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 public class AppointmentV2 {
@@ -11,17 +11,20 @@ public class AppointmentV2 {
     private Integer id;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private Instant createdAt;
 
     @JsonProperty("modified_at")
-    private Date modifiedAt;
+    private Instant modifiedAt;
 
     private Boolean active;
 
     @JsonProperty("start_at")
-    private Date startAt;
+    private Instant startAt;
 
     private Integer duration;
+
+    @JsonProperty("event_group")
+    private Integer eventGroup;
 
     @JsonProperty("type_id")
     private Integer typeId;
@@ -43,5 +46,11 @@ public class AppointmentV2 {
     @JsonProperty("sales_resource")
     private Integer salesResource;
 
-    private Integer[] resources;
+    @JsonProperty("cancellation_reason")
+    private Integer cancellationReason;
+
+    @JsonProperty("cancellation_reason_text")
+    private String cancellationReasonText;
+
+    private Resource[] resources;
 }

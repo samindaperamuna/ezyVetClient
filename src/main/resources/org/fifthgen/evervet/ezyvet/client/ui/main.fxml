@@ -89,7 +89,7 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </Label>
-                <DatePicker prefWidth="200.0">
+                <DatePicker fx:id="appointmentDatePicker" prefWidth="200.0">
                     <HBox.margin>
                         <Insets left="20" right="20.0"/>
                     </HBox.margin>
@@ -104,9 +104,10 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </ComboBox>
-                <Button alignment="CENTER" mnemonicParsing="false" text="Search"/>
+                <Button fx:id="searchButton" alignment="CENTER" mnemonicParsing="false" onAction="onSearchAction"
+                        text="Search"/>
             </HBox>
-            <TableView fx:id="orderSummaryTable" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+            <TableView fx:id="appointmentsTable" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>

@@ -3,7 +3,7 @@ package org.fifthgen.evervet.ezyvet.api.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 public class Animal {
@@ -13,10 +13,10 @@ public class Animal {
     private Integer active;
 
     @JsonProperty("created_at")
-    private Date createdAt;
+    private Instant createdAt;
 
     @JsonProperty("modified_at")
-    private Date modifiedAt;
+    private Instant modifiedAt;
 
     private String name;
 
@@ -44,7 +44,7 @@ public class Animal {
     private String rabiesNumber;
 
     @JsonProperty("date_of_rabies_vaccination")
-    private Date dateOfRabiesVaccination;
+    private Instant dateOfRabiesVaccination;
 
     @JsonProperty("microchip_number")
     private String microchipNumber;
@@ -53,19 +53,19 @@ public class Animal {
     private Integer contactId;
 
     @JsonProperty("date_of_birth")
-    private Date dateOfBirth;
+    private Instant dateOfBirth;
 
     @JsonProperty("is_estimated_date_of_birth")
     private Integer isEstimatedDateOfBirth;
 
     @JsonProperty("date_of_death")
-    private Date dateOfDeath;
+    private Instant dateOfDeath;
 
     @JsonProperty("death_reason")
     private String deathReason;
 
     @JsonProperty("date_of_desex")
-    private Date dateOfDeSex;
+    private Instant dateOfDeSex;
 
     @JsonProperty("referring_clinic_id")
     private Integer referringClinicId;

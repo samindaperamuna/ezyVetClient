@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class AppointmentStatus {
+public class Resource {
 
     private Integer id;
 
@@ -19,4 +19,11 @@ public class AppointmentStatus {
     private Instant modifiedAt;
 
     private String name;
+
+    private String type;
+
+    private String access;
+
+    @JsonProperty("ownership_id")
+    private Integer ownershipId;
 }

@@ -37,7 +37,7 @@ public class APIV1Test {
             @Override
             public void onCompleted(Token token) {
                 Assert.assertNotNull(token);
-                testContext.log.info("Fetched token complete: " + token.toString());
+                testContext.log.info("Fetch token complete: " + token.toString());
             }
 
             @Override
