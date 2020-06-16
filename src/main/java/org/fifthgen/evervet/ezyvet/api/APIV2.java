@@ -16,11 +16,13 @@ import org.fifthgen.evervet.ezyvet.util.PropertyKey;
 import org.fifthgen.evervet.ezyvet.util.PropertyManager;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class APIV2 extends APIBase {
 
@@ -33,15 +35,36 @@ public class APIV2 extends APIBase {
 
     public void getAppointmentList(GetAppointmentV2Callback callback) {
         final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_REVISION + APPOINTMENT_PATH);
-        getAppointmentList(getRequest, callback);
+        getAppointmentListCall(getRequest, callback);
     }
 
-    public void getAppointmentList(Date date, AppointmentType type, GetAppointmentV2Callback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_REVISION + APPOINTMENT_PATH + "?start_at=" + date.getTime() + "&type_id=" + type.getId());
-        getAppointmentList(getRequest, callback);
+    public void getAppointmentList(AppointmentType type, GetAppointmentV2Callback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_REVISION + APPOINTMENT_PATH + "?type_id=" + type.getId());
+        getAppointmentListCall(getRequest, callback);
     }
 
-    private void getAppointmentList(HttpGet request, GetAppointmentV2Callback callback) {
+    public void getAppointmentList(LocalDate date, GetAppointmentV2Callback callback) {
+        getAppointmentList(new GetAppointmentV2Callback() {
+            @Override
+            public void onCompleted(List<AppointmentV2> appointmentList) {
+                callback.onCompleted(filterAppointmentByDate(appointmentList, date));
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Failed to fetch the appointments: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    private List<AppointmentV2> filterAppointmentByDate(List<AppointmentV2> appointments, LocalDate date) {
+        return appointments.stream().filter(appointment -> {
+            LocalDate appointmentDate = appointment.getStartAt().atZone(ZoneId.systemDefault()).toLocalDate();
+            return date.equals(appointmentDate);
+        }).collect(Collectors.toList());
+    }
+
+    private void getAppointmentListCall(HttpGet request, GetAppointmentV2Callback callback) {
         sendAPIRequest(request, TokenScope.READ_APPOINTMENT, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
