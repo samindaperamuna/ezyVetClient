@@ -7,10 +7,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
-import org.fifthgen.evervet.ezyvet.api.callback.ConnectCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalListCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentTypeListCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.*;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.Contact;
@@ -32,6 +29,42 @@ public class APIV1 extends APIBase {
 
     public APIV1() {
         super.log = Logger.getLogger(getClass().getName());
+    }
+
+    public void getAnimal(int animalId, GetAnimalCallback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + ANIMAL_PATH + "?id=" + animalId);
+        sendAPIRequest(getRequest, TokenScope.READ_ANIMAL, new ConnectCallback() {
+            @Override
+            public void onCompleted(HttpResponse response, CountDownLatch latch) {
+                HttpEntity entity = response.getEntity();
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+
+                try {
+                    JsonNode node = mapper.readTree(EntityUtils.toString(entity));
+                    JsonNode itemsNode = node.path("items");
+
+                    List<Animal> animals = new ArrayList<>();
+                    for (JsonNode itemNode : itemsNode) {
+                        animals.add(mapper.readerFor(Animal.class).readValue(itemNode.get("animal")));
+                    }
+
+                    callback.onCompleted(animals.get(0));
+                } catch (IOException e) {
+                    String msg = "Couldn't convert response into an animal.";
+                    log.severe(msg + ": \n" + e.getLocalizedMessage());
+                    callback.onFailed(e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Exception in request: \n" + e.getLocalizedMessage());
+                callback.onFailed(e);
+            }
+        });
     }
 
     public void getAnimalList(GetAnimalListCallback callback) {

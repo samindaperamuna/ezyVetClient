@@ -3,28 +3,29 @@ package org.fifthgen.evervet.ezyvet.util;
 import org.fifthgen.evervet.ezyvet.api.model.Token;
 import org.fifthgen.evervet.ezyvet.api.model.TokenScope;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Used to store tokens as they are fetched from the API and retrieve existing tokens.
- * Holds tokens in session memory.
- * Make sure that the tokens obtained from this store are validated before use
- * as the might be expired at the time of use.
+ * Used to store a single token as as it is fetched from the API and retrieve it later.
+ * Holds the token in session memory.
+ * Make sure that the token obtained from this store is validated before use
+ * as it might be expired at the time of use.
  */
 public class TokenStorage {
 
     // Singleton instance variable.
     private static TokenStorage instance;
 
-    // Token storage.
-    private final Map<TokenScope, Token> tokenStore;
+    // Holds the current token scope.
+    private TokenScope scope;
+
+    // Holds the current token instance.
+    private Token token;
 
     /**
      * Private constructor ensures the instantiation of this class remains singleton.
      */
     private TokenStorage() {
-        this.tokenStore = new HashMap<>();
+        this.token = null;
+        this.scope = null;
     }
 
     /**
@@ -47,7 +48,8 @@ public class TokenStorage {
      * @param token Token to be stored.
      */
     public void storeToken(TokenScope scope, Token token) {
-        this.tokenStore.put(scope, token);
+        this.token = token;
+        this.scope = scope;
     }
 
     /**
@@ -57,7 +59,11 @@ public class TokenStorage {
      * @return Token if found, else null.
      */
     public Token getToken(TokenScope scope) {
-        return this.tokenStore.get(scope);
+        if (this.scope == scope) {
+            return token;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -67,6 +73,6 @@ public class TokenStorage {
      * @return Whether the store contains specific scope as key.
      */
     public boolean hasToken(TokenScope scope) {
-        return this.tokenStore.containsKey(scope);
+        return this.scope == scope;
     }
 }

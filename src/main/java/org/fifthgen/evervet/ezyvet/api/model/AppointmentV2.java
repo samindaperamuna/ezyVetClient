@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -23,6 +24,7 @@ public class AppointmentV2 {
 
     private Integer duration;
 
+    @JsonIgnore
     @JsonProperty("event_group")
     private Integer eventGroup;
 
@@ -36,6 +38,9 @@ public class AppointmentV2 {
 
     @JsonProperty("animal_id")
     private Integer animalId;
+
+    @JsonIgnore
+    private Animal animal;
 
     @JsonProperty("consult_id")
     private Integer consultId;

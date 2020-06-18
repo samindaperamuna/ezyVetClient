@@ -1,10 +1,7 @@
 package org.fifthgen.evervet.ezyvet.api;
 
 import org.fifthgen.evervet.ezyvet.TestContext;
-import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalListCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentTypeListCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetTokenCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.*;
 import org.fifthgen.evervet.ezyvet.api.model.*;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,6 +41,23 @@ public class APIV1Test {
             public void onFailed(Exception e) {
                 exception.expect(Exception.class);
                 testContext.log.severe("Failed to fetch the token: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getAnimalTest() {
+        api.getAnimal(1, new GetAnimalCallback() {
+            @Override
+            public void onCompleted(Animal animal) {
+                Assert.assertNotNull(animal);
+                testContext.log.info("Fetch animal complete : " + animal);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch animal: " + e.getLocalizedMessage());
             }
         });
     }
