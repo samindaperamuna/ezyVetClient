@@ -30,7 +30,7 @@
                 </MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Tools">
-                <MenuItem mnemonicParsing="false" text="Generate X-RAY Input">
+                <MenuItem mnemonicParsing="false" onAction="#onXRAYAction" text="Generate X-RAY Input">
                     <graphic>
                         <FontIcon iconLiteral="mdi-radioactive" iconSize="16"/>
                     </graphic>
@@ -47,7 +47,7 @@
                     </accelerator>
                 </MenuItem>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <MenuItem mnemonicParsing="false" text="Refresh">
+                <MenuItem mnemonicParsing="false" onAction="#onRefreshAction" text="Refresh">
                     <graphic>
                         <FontIcon iconLiteral="gmi-refresh" iconSize="16"/>
                     </graphic>
@@ -122,7 +122,7 @@
             <padding>
                 <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
             </padding>
-            <Label fx:id="errorLabel" styleClass="error-label">
+            <Label fx:id="notificationLabel">
                 <HBox.margin>
                     <Insets right="10.0"/>
                 </HBox.margin>

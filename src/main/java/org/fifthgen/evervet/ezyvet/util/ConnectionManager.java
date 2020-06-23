@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.util;
 
+import lombok.extern.java.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.concurrent.FutureCallback;
@@ -21,20 +22,18 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
+@Log
 public class ConnectionManager {
 
     private static final int TIMEOUT = 2000;
     private static ConnectionManager instance;
 
-    private final Logger log;
 
     /**
      * Private constructor ensures the instantiation of this class remains singleton.
      */
     private ConnectionManager() {
-        this.log = Logger.getLogger(getClass().getName());
     }
 
     /**
@@ -67,12 +66,12 @@ public class ConnectionManager {
                 if (socket.isConnected()) {
                     return true;
                 } else {
-                    Logger.getGlobal().info("Cannot connect to the remote host.");
+                    log.info("Cannot connect to the remote host.");
                     return false;
                 }
             }
         } catch (IOException e) {
-            Logger.getGlobal().severe("An error occurred while connecting to the remote host.");
+            log.severe("An error occurred while connecting to the remote host.");
         }
 
         return false;
@@ -140,7 +139,7 @@ public class ConnectionManager {
                 latch.await(30, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
-            Logger.getGlobal().severe("Couldn't execute the request using the AsyncClient.");
+            log.severe("Couldn't execute the request using the AsyncClient.");
         }
     }
 }

@@ -1,17 +1,18 @@
 package org.fifthgen.evervet.ezyvet.util;
 
+import lombok.extern.java.Log;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
 
+@Log
 public class PropertyManager {
 
     private static final String PROPERTY_FILE = "application.properties";
-    private static Logger logger;
 
     private static final Map<PropertyKey, String> DEFAULT_VALUES = Map.ofEntries(
             Map.entry(PropertyKey.API_URL, "https://api.trial.ezyvet.com/v1"),
@@ -24,8 +25,6 @@ public class PropertyManager {
     private static Properties properties;
 
     private PropertyManager() {
-        // Initialize the logger.
-        logger = Logger.getLogger(getClass().getName());
         properties = new Properties();
 
         // Check if a property file exists. If not generate the default one.
@@ -69,7 +68,7 @@ public class PropertyManager {
         try (Reader fis = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
             properties.load(fis);
         } catch (IOException e) {
-            logger.severe("Failed to load property file from class path.");
+            log.severe("Failed to load property file from class path.");
         }
     }
 
@@ -79,7 +78,7 @@ public class PropertyManager {
         try (FileWriter fo = new FileWriter(file)) {
             properties.store(fo, "Auto generated file. Do not change.");
         } catch (IOException e) {
-            logger.severe("Failed to write property file to class path.");
+            log.severe("Failed to write property file to class path.");
         }
     }
 }

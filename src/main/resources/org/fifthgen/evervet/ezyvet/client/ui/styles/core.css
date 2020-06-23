@@ -28,8 +28,16 @@
     -fx-alignment: center;
 }
 
-.error-label {
+.notification-error {
     -fx-text-fill: 'red';
+}
+
+.notification-warning {
+    -fx-text-fill: 'orange';
+}
+
+.notification-info {
+    -fx-text-fill: 'green';
 }
 
 .title-label {
