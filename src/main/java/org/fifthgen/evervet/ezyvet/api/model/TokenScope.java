@@ -2,6 +2,8 @@ package org.fifthgen.evervet.ezyvet.api.model;
 
 public enum TokenScope {
     READ_ANIMAL("read-animal"),
+    READ_SPECIES("read-species"),
+    READ_SEX("read-sex"),
     READ_CONTACT("read-contact"),
     READ_APPOINTMENT("read-appointment"),
     READ_APPOINTMENT_TYPE("read-appointmenttype");

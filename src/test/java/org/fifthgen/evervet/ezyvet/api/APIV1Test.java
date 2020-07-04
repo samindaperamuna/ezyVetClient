@@ -80,6 +80,57 @@ public class APIV1Test {
     }
 
     @Test
+    public void getSpeciesTest() {
+        api.getSpecies(1, new GetSpeciesCallback() {
+            @Override
+            public void onCompleted(Species species) {
+                Assert.assertNotNull(species);
+                testContext.log.info("Fetch species complete : " + species);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch species: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getSexTest() {
+        api.getSex(1, new GetSexCallback() {
+            @Override
+            public void onCompleted(Sex sex) {
+                Assert.assertNotNull(sex);
+                testContext.log.info("Fetch sex complete : " + sex);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch sex: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getBreedTest() {
+        api.getBreed(628, new GetBreedCallback() {
+            @Override
+            public void onCompleted(Breed breed) {
+                Assert.assertNotNull(breed);
+                testContext.log.info("Fetch breed complete : " + breed);
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch breed: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
     public void getContactTest() {
         api.getContact(24, new GetContactCallback() {
             @Override

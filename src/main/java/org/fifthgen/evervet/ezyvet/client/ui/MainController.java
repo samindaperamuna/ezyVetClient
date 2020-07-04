@@ -47,13 +47,16 @@ public class MainController implements Initializable {
     public Stage stage;
 
     @FXML
+    private MenuItem mnuItmXRay;
+
+    @FXML
+    private MenuItem mnuItmDICOM;
+
+    @FXML
     private DatePicker appointmentDatePicker;
 
     @FXML
     private ComboBox<AppointmentType> appointmentTypeCombo;
-
-    @FXML
-    private Button searchButton;
 
     @FXML
     private TableView<AppointmentV2> appointmentsTable;
@@ -112,6 +115,31 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void onPreferencesAction() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences.fxml"));
+
+        try {
+            // Load preference controller.
+            Parent root = loader.load();
+            PreferencesController controller = loader.getController();
+
+            Stage prefStage = new Stage();
+
+            // Set stage.
+            controller.stage = prefStage;
+
+            prefStage.setScene(new Scene(root));
+            prefStage.initOwner(stage.getOwner());
+            prefStage.setResizable(false);
+            prefStage.initModality(Modality.APPLICATION_MODAL);
+            prefStage.initStyle(StageStyle.UNIFIED);
+            prefStage.show();
+        } catch (IOException e) {
+            log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
+        }
+    }
+
+    @FXML
     private void onXRAYAction() {
 
     }
@@ -148,13 +176,20 @@ public class MainController implements Initializable {
 
     @FXML
     private void onSearchAction() {
+        toggleDisableMenuItems(true);
+
         ProgressController controller = createProgressView();
         controller.stage.show();
 
         // Handles the progress window.
         CountDownLatch progressLatch = new CountDownLatch(1);
 
-        LocalDate appointmentDate = appointmentDatePicker.getValue();
+        if (appointmentDatePicker.getValue() == null) {
+            appointmentDatePicker.setValue(LocalDate.now());
+        }
+
+        final LocalDate appointmentDate = appointmentDatePicker.getValue();
+
         APIV2 apiv2 = new APIV2();
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
@@ -169,11 +204,14 @@ public class MainController implements Initializable {
                 private TableRow<AppointmentV2> tableRow(TableView<AppointmentV2> tableView) {
                     TableRow<AppointmentV2> row = new TableRow<>();
                     row.setOnMouseClicked(event -> {
-                        if (!row.isEmpty())
+                        if (!row.isEmpty()) {
+                            toggleDisableMenuItems(false);
+
                             if (event.getClickCount() == 2) {
                                 AppointmentV2 appointment = row.getItem();
                                 //viewOrder(summary.getOrderId());
                             }
+                        }
                     });
 
                     return row;
@@ -185,27 +223,25 @@ public class MainController implements Initializable {
                         APIV1 apiv1 = new APIV1();
                         CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
 
-                        appointmentList.forEach(appointmentV2 -> {
-                            apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
-                                @Override
-                                public void onCompleted(Animal animal) {
-                                    animalCollectionLatch.countDown();
-                                    if (animal != null) {
-                                        appointmentV2.setAnimal(animal);
-                                    }
+                        appointmentList.forEach(appointmentV2 -> apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
+                            @Override
+                            public void onCompleted(Animal animal) {
+                                animalCollectionLatch.countDown();
+                                if (animal != null) {
+                                    appointmentV2.setAnimal(animal);
                                 }
+                            }
 
-                                @Override
-                                public void onFailed(Exception e) {
-                                    animalCollectionLatch.countDown();
-                                    String msg = "Failed to load animal for appointment at: ";
-                                    LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
+                            @Override
+                            public void onFailed(Exception e) {
+                                animalCollectionLatch.countDown();
+                                String msg = "Failed to load animal for appointment at: ";
+                                LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
 
-                                    log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
-                                    NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
-                                }
-                            });
-                        });
+                                log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
+                                NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
+                            }
+                        }));
 
                         try {
                             animalCollectionLatch.await(REQUEST_UPDATE_DELAY, TimeUnit.SECONDS);
@@ -286,6 +322,16 @@ public class MainController implements Initializable {
                 Platform.runLater(controller.stage::close);
             }
         });
+    }
+
+    private void toggleDisableMenuItems(boolean disable) {
+        if (mnuItmXRay.isDisable() != disable) {
+            mnuItmXRay.setDisable(disable);
+        }
+
+        if (mnuItmDICOM.isDisable() != disable) {
+            mnuItmDICOM.setDisable(disable);
+        }
     }
 
     private ProgressController createProgressView() {

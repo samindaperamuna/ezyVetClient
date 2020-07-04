@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.net.URL?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" xmlns="http://javafx.com/javafx/10.0.2-internal"
+      fx:controller="org.fifthgen.evervet.ezyvet.client.ui.PreferencesController">
+    <stylesheets>
+        <URL value="@../ui/styles/core.css"/>
+    </stylesheets>
+    <AnchorPane>
+        <Label styleClass="title-label" text="Preferences" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0"
+               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0"/>
+    </AnchorPane>
+    <TabPane tabClosingPolicy="UNAVAILABLE">
+        <Tab text="General">
+            <graphic>
+                <FontIcon iconLiteral="gmi-settings-applications" iconSize="16"/>
+            </graphic>
+            <GridPane styleClass="bordered-panel">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="400.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Label text="Partner ID" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="partnerIdText" promptText="Enter your partner ID." GridPane.columnIndex="3"
+                           GridPane.rowIndex="1"/>
+                <Label text="Department" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="departmentText" promptText="Enter your department name." GridPane.columnIndex="3"
+                           GridPane.rowIndex="2"/>
+            </GridPane>
+        </Tab>
+        <Tab text="File Generation">
+            <graphic>
+                <FontIcon iconLiteral="mdi-file-document-box" iconSize="16"/>
+            </graphic>
+            <GridPane styleClass="bordered-panel">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="400.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Label text="X-Ray Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField promptText="Enter X-Ray file path." GridPane.columnIndex="3" GridPane.rowIndex="1"
+                           fx:id="xRayPathText"/>
+                <Label text="DICOM Path" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="dicomPathText" promptText="Enter DICOM file path." GridPane.columnIndex="3"
+                           GridPane.rowIndex="2"/>
+                <Label text="Imaging Code" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="imagingCodeText" promptText="Enter ezyVet imaging code." GridPane.columnIndex="3"
+                           GridPane.rowIndex="3"/>
+                <Label text="Imaging Desc." GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <TextField fx:id="imagingDescText" promptText="Enter ezyVet imaging description."
+                           GridPane.columnIndex="3" GridPane.rowIndex="4"/>
+            </GridPane>
+        </Tab>
+        <Tab text="Account">
+            <graphic>
+                <FontIcon iconLiteral="gmi-account-box" iconSize="16"/>
+            </graphic>
+            <GridPane styleClass="bordered-panel">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="400.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Label text="Client ID" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="clientIdText" promptText="Enter your client ID." GridPane.columnIndex="3"
+                           GridPane.rowIndex="1"/>
+
+                <Label text="Client token" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="clientSecretText" promptText="Enter your client secret." GridPane.columnIndex="3"
+                           GridPane.rowIndex="2"/>
+
+            </GridPane>
+        </Tab>
+        <Tab text="API">
+            <graphic>
+                <FontIcon iconLiteral="gmi-cloud-circle" iconSize="16"/>
+            </graphic>
+            <GridPane styleClass="bordered-panel">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="400.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Label text="API URL" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="apiUrlText" promptText="Enter the API URL." GridPane.columnIndex="3"
+                           GridPane.rowIndex="1"/>
+            </GridPane>
+        </Tab>
+
+        <VBox.margin>
+            <Insets/>
+        </VBox.margin>
+    </TabPane>
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button mnemonicParsing="false" onAction="#onApplyAction" prefWidth="75.0" text="Apply"/>
+        <Button mnemonicParsing="false" onAction="#onCancelAction" prefWidth="75.0" text="Cancel"/>
+        <opaqueInsets>
+            <Insets/>
+        </opaqueInsets>
+        <VBox.margin>
+            <Insets/>
+        </VBox.margin>
+        <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        </padding>
+    </HBox>
+</VBox>

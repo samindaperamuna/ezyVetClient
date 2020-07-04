@@ -17,7 +17,7 @@
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="File">
-                <MenuItem mnemonicParsing="false" text="Preferences">
+                <MenuItem mnemonicParsing="false" onAction="#onPreferencesAction" text="Preferences">
                     <graphic>
                         <FontIcon iconLiteral="gmi-settings" iconSize="16"/>
                     </graphic>
@@ -30,7 +30,8 @@
                 </MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Tools">
-                <MenuItem mnemonicParsing="false" onAction="#onXRAYAction" text="Generate X-RAY Input">
+                <MenuItem fx:id="mnuItmXRay" mnemonicParsing="false" disable="true" onAction="#onXRAYAction"
+                          text="Generate X-RAY Input">
                     <graphic>
                         <FontIcon iconLiteral="mdi-radioactive" iconSize="16"/>
                     </graphic>
@@ -38,7 +39,7 @@
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
-                <MenuItem mnemonicParsing="false" text="Generate DICOM Worklist">
+                <MenuItem fx:id="mnuItmDICOM" mnemonicParsing="false" disable="true" text="Generate DICOM Worklist">
                     <graphic>
                         <FontIcon iconLiteral="mdi-microscope" iconSize="16"/>
                     </graphic>
@@ -104,7 +105,7 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </ComboBox>
-                <Button fx:id="searchButton" alignment="CENTER" mnemonicParsing="false" onAction="#onSearchAction"
+                <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSearchAction"
                         text="Search"/>
             </HBox>
             <TableView fx:id="appointmentsTable" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">

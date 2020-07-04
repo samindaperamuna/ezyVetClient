@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -89,4 +90,16 @@ public class Animal {
     private Integer notesImportant;
 
     private String guid;
+
+    @JsonIgnore
+    private Contact contact;
+
+    @JsonIgnore
+    private Species species;
+
+    @JsonIgnore
+    private Sex sex;
+
+    @JsonIgnore
+    private Breed breed;
 }
