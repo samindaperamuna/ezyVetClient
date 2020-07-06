@@ -26,6 +26,7 @@ import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
 import org.fifthgen.evervet.ezyvet.client.ui.factory.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
+import org.fifthgen.evervet.ezyvet.client.util.XRAYGenerator;
 import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
 
 import java.io.IOException;
@@ -141,7 +142,15 @@ public class MainController implements Initializable {
 
     @FXML
     private void onXRAYAction() {
+        if (!appointmentsTable.getSelectionModel().isEmpty()) {
+            AppointmentV2 appointment = appointmentsTable.getSelectionModel().getSelectedItem();
 
+            XRAYGenerator generator = new XRAYGenerator();
+            generator.generateXRAYFile(appointment.getAnimal());
+        } else {
+            log.warning("Selection empty.");
+            NotificationUtil.notifyWarning(this, "Please select a row first!");
+        }
     }
 
     @FXML

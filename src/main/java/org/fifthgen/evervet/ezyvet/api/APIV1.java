@@ -177,7 +177,7 @@ public class APIV1 extends APIBase {
 
     public void getBreed(int breedId, GetBreedCallback callback) {
         final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + BREED_PATH + "?id=" + breedId);
-        sendAPIRequest(getRequest, TokenScope.READ_SEX, new ConnectCallback() {
+        sendAPIRequest(getRequest, TokenScope.READ_BREED, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
                 HttpEntity entity = response.getEntity();
