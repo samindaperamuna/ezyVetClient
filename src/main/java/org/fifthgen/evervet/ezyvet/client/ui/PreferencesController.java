@@ -105,6 +105,9 @@ public class PreferencesController implements Initializable {
             // API preferences
             propertyManager.setProperty(PropertyKey.API_URL.getKey(), apiUrlText.getText());
 
+            // Save to file.
+            propertyManager.save();
+
             Logger.getGlobal().info("Preferences saved to property file.");
 
             stage.close();

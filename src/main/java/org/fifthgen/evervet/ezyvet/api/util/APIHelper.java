@@ -7,6 +7,7 @@ import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetSexCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetSpeciesCallback;
 import org.fifthgen.evervet.ezyvet.api.model.*;
+import org.fifthgen.evervet.ezyvet.client.ui.util.AtomicProgressCounter;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -19,9 +20,10 @@ public class APIHelper {
     /**
      * Fetch the missing animal details asynchronously. Make sure to run this in a non UI thread to stop blocking.
      *
-     * @param animal Animal object.
+     * @param animal   Animal object.
+     * @param progress Progress counter.
      */
-    public static void fetchCompleteAnimalSync(final Animal animal) {
+    public static void fetchCompleteAnimalSync(final Animal animal, AtomicProgressCounter progress) {
         APIV1 api = new APIV1();
         CountDownLatch latch = new CountDownLatch(4);
 
@@ -30,12 +32,14 @@ public class APIHelper {
             @Override
             public void onCompleted(Contact contact) {
                 animal.setContact(contact);
+                progress(progress);
                 latch.countDown();
             }
 
             @Override
             public void onFailed(Exception e) {
                 log.warning(String.format("Failed to fetch contact for animal : %s ID : %d", animal.getName(), animal.getId()));
+                progress(progress);
                 latch.countDown();
             }
         });
@@ -45,12 +49,14 @@ public class APIHelper {
             @Override
             public void onCompleted(Species species) {
                 animal.setSpecies(species);
+                progress(progress);
                 latch.countDown();
             }
 
             @Override
             public void onFailed(Exception e) {
                 log.warning(String.format("Failed to fetch species for animal : %s ID : %d", animal.getName(), animal.getId()));
+                progress(progress);
                 latch.countDown();
             }
         });
@@ -60,12 +66,14 @@ public class APIHelper {
             @Override
             public void onCompleted(Sex sex) {
                 animal.setSex(sex);
+                progress(progress);
                 latch.countDown();
             }
 
             @Override
             public void onFailed(Exception e) {
                 log.warning(String.format("Failed to fetch sex for animal : %s ID : %d", animal.getName(), animal.getId()));
+                progress(progress);
                 latch.countDown();
             }
         });
@@ -75,12 +83,14 @@ public class APIHelper {
             @Override
             public void onCompleted(Breed breed) {
                 animal.setBreed(breed);
+                progress(progress);
                 latch.countDown();
             }
 
             @Override
             public void onFailed(Exception e) {
                 log.warning(String.format("Failed to fetch breed for animal : %s ID : %d", animal.getName(), animal.getId()));
+                progress(progress);
                 latch.countDown();
             }
         });
@@ -90,5 +100,14 @@ public class APIHelper {
         } catch (InterruptedException e) {
             log.severe(String.format("Couldn't fetch species for animal nam : %s, ID : %d ", animal.getName(), animal.getId()));
         }
+    }
+
+    /**
+     * Advance the progress counter per each thread.
+     *
+     * @param progress Progress counter in an atomic boolean.
+     */
+    private static void progress(AtomicProgressCounter progress) {
+        progress.set(progress.get() + 20);
     }
 }

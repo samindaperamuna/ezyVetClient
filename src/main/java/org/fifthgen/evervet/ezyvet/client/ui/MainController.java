@@ -26,6 +26,7 @@ import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
 import org.fifthgen.evervet.ezyvet.client.ui.factory.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
+import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressBarHelper;
 import org.fifthgen.evervet.ezyvet.client.util.XRAYGenerator;
 import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
 
@@ -48,6 +49,7 @@ public class MainController implements Initializable {
     public Stage stage;
 
     @FXML
+    @Getter
     private MenuItem mnuItmXRay;
 
     @FXML
@@ -61,6 +63,10 @@ public class MainController implements Initializable {
 
     @FXML
     private TableView<AppointmentV2> appointmentsTable;
+
+    @FXML
+    @Getter
+    private ProgressBar progressBar;
 
     @FXML
     @Getter
@@ -145,7 +151,10 @@ public class MainController implements Initializable {
         if (!appointmentsTable.getSelectionModel().isEmpty()) {
             AppointmentV2 appointment = appointmentsTable.getSelectionModel().getSelectedItem();
 
+            ProgressBarHelper.initProgressBar(this);
+
             XRAYGenerator generator = new XRAYGenerator();
+            generator.getProgress().setPropertyChangeListener(event -> ProgressBarHelper.setProgress(this, event));
             generator.generateXRAYFile(appointment.getAnimal());
         } else {
             log.warning("Selection empty.");

@@ -62,6 +62,10 @@ public class PropertyManager {
         return properties.setProperty(key, value).toString();
     }
 
+    public void save() {
+        writeToFile();
+    }
+
     private synchronized void readFromFile() {
         File file = new File(PROPERTY_FILE);
 

@@ -4,6 +4,7 @@ import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.APIV1;
 import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
+import org.fifthgen.evervet.ezyvet.client.ui.util.AtomicProgressCounter;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,11 +22,13 @@ public class APIHelperTest {
         apiv1.getAnimal(1, new GetAnimalCallback() {
             @Override
             public void onCompleted(Animal animal) {
-                APIHelper.fetchCompleteAnimalSync(animal);
+                AtomicProgressCounter counter = new AtomicProgressCounter();
+                APIHelper.fetchCompleteAnimalSync(animal, counter);
                 Assert.assertNotNull(animal.getContact());
                 Assert.assertNotNull(animal.getSpecies());
                 Assert.assertNotNull(animal.getSex());
                 log.info("Fetching info complete : " + animal);
+                log.info("Progress : " + counter.get());
             }
 
             @Override
