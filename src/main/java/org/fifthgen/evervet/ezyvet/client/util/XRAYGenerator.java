@@ -23,7 +23,10 @@ import java.time.format.FormatStyle;
 @Log
 public class XRAYGenerator {
 
+    private static final String TIME_FORMAT = "HH:mm:ss";
     private static final String EXT = ".txt";
+
+    private final String filePattern = "%s" + File.separator + "%s_%s_%s_%s" + EXT;
 
     private final String ezyVetCode;
     private final String ezyVetDesc;
@@ -66,7 +69,7 @@ public class XRAYGenerator {
         }
 
         String nowDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String nowTime = LocalTime.now().format(DateTimeFormatter.ISO_TIME);
+        String nowTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME_FORMAT));
 
         Path dirPath = Paths.get(PropertyManager.getInstance().getProperty(PropertyKey.X_RAY_PATH.getKey()));
 
@@ -76,7 +79,7 @@ public class XRAYGenerator {
             log.info("New directories were created.");
         }
 
-        Path filePath = Paths.get(dirPath.toString() + "/" + ownLast + aniName + "_" + nowDate + nowTime + EXT);
+        Path filePath = Paths.get(String.format(filePattern, dirPath, ownLast, aniName, nowDate, nowTime));
         File file = filePath.toFile();
 
         try {
