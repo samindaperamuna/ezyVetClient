@@ -12,6 +12,9 @@ import org.fifthgen.evervet.ezyvet.util.PropertyManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Log
 public class DICOMGenerator extends FileGenerator {
@@ -134,12 +137,35 @@ public class DICOMGenerator extends FileGenerator {
                         + "(fffe,e0dd)" + LINE_END;
 
                 Files.writeString(file.toPath(), content);
+                convertToWorklist();
                 progressComplete();
             }
         } catch (IOException e) {
             log.severe("Failed to create new file : " + e.getLocalizedMessage());
             progress.setErrorMsg("Failed to create new file");
             progressComplete();
+        }
+    }
+
+    private void convertToWorklist() {
+        PropertyManager properties = PropertyManager.getInstance();
+
+        String exec = properties.getProperty(PropertyKey.DICOM_EXEC.getKey());
+        String params = properties.getProperty(PropertyKey.DICOM_PARAMS.getKey());
+        String dicomPath = properties.getProperty(PropertyKey.DICOM_PATH.getKey());
+        String wlPath = properties.getProperty(PropertyKey.WL_PATH.getKey());
+
+        List<String> commands = new ArrayList<>();
+        commands.add(exec);
+        commands.addAll(Arrays.asList(params.split(" ")));
+        commands.add(dicomPath);
+        commands.add(wlPath);
+
+        try {
+            Process process = new ProcessBuilder(commands).start();
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -123,7 +123,7 @@
             <padding>
                 <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
             </padding>
-            <ProgressBar fx:id="progressBar" visible="false" prefWidth="100.0" progress="0.0" HBox.hgrow="NEVER"/>
+            <ProgressBar fx:id="progressBar" prefWidth="100.0" progress="0.0" visible="false" HBox.hgrow="NEVER"/>
             <Separator visible="false" HBox.hgrow="ALWAYS"/>
             <Label fx:id="notificationLabel">
                 <HBox.margin>

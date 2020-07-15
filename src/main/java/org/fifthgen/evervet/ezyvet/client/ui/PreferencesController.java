@@ -28,13 +28,22 @@ public class PreferencesController implements Initializable {
     private TextField xRayPathText;
 
     @FXML
-    private TextField dicomPathText;
-
-    @FXML
     private TextField imagingCodeText;
 
     @FXML
     private TextField imagingDescText;
+
+    @FXML
+    private TextField dicomPathText;
+
+    @FXML
+    private TextField wlPathText;
+
+    @FXML
+    private TextField dicomExecPath;
+
+    @FXML
+    private TextField execParamsText;
 
     @FXML
     private TextField clientIdText;
@@ -54,11 +63,16 @@ public class PreferencesController implements Initializable {
         partnerIdText.setText(propertyManager.getProperty(PropertyKey.PARTNER_ID.getKey()));
         departmentText.setText(propertyManager.getProperty(PropertyKey.DEPARTMENT.getKey()));
 
-        // File generation preferences
+        // X-RAY preferences
         xRayPathText.setText(propertyManager.getProperty(PropertyKey.X_RAY_PATH.getKey()));
-        dicomPathText.setText(propertyManager.getProperty(PropertyKey.DICOM_PATH.getKey()));
         imagingCodeText.setText(propertyManager.getProperty(PropertyKey.IMAGING_CODE.getKey()));
         imagingDescText.setText(propertyManager.getProperty(PropertyKey.IMAGING_DESC.getKey()));
+
+        // DICOM preferences
+        dicomPathText.setText(propertyManager.getProperty(PropertyKey.DICOM_PATH.getKey()));
+        wlPathText.setText(propertyManager.getProperty(PropertyKey.WL_PATH.getKey()));
+        dicomExecPath.setText(propertyManager.getProperty(PropertyKey.DICOM_EXEC.getKey()));
+        execParamsText.setText(propertyManager.getProperty(PropertyKey.DICOM_PARAMS.getKey()));
 
         // Account preferences
         clientIdText.setText(propertyManager.getProperty(PropertyKey.CLIENT_ID.getKey()));
@@ -92,11 +106,16 @@ public class PreferencesController implements Initializable {
             propertyManager.setProperty(PropertyKey.PARTNER_ID.getKey(), partnerIdText.getText());
             propertyManager.setProperty(PropertyKey.DEPARTMENT.getKey(), departmentText.getText());
 
-            // File generation preferences
+            // X-Ray preferences
             propertyManager.setProperty(PropertyKey.X_RAY_PATH.getKey(), xRayPathText.getText());
-            propertyManager.setProperty(PropertyKey.DICOM_PATH.getKey(), dicomPathText.getText());
             propertyManager.setProperty(PropertyKey.IMAGING_CODE.getKey(), imagingCodeText.getText());
             propertyManager.setProperty(PropertyKey.IMAGING_DESC.getKey(), imagingDescText.getText());
+
+            // DICOM preferences
+            propertyManager.setProperty(PropertyKey.DICOM_PATH.getKey(), dicomPathText.getText());
+            propertyManager.setProperty(PropertyKey.WL_PATH.getKey(), wlPathText.getText());
+            propertyManager.setProperty(PropertyKey.DICOM_EXEC.getKey(), dicomExecPath.getText());
+            propertyManager.setProperty(PropertyKey.DICOM_PARAMS.getKey(), execParamsText.getText());
 
             // Account preferences
             propertyManager.setProperty(PropertyKey.CLIENT_ID.getKey(), clientIdText.getText());

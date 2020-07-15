@@ -8,6 +8,9 @@ public enum PropertyKey {
     CLIENT_SECRET("client-secret"),
     X_RAY_PATH("x-ray-path"),
     DICOM_PATH("dicom-path"),
+    WL_PATH("wl-path"),
+    DICOM_EXEC("dicom-exec"),
+    DICOM_PARAMS("dicom-params"),
     IMAGING_CODE("imaging-code"),
     IMAGING_DESC("imaging-desc");
 

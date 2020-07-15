@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import org.kordamp.ikonli.javafx.*?>
 <?import java.net.URL?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
       minWidth="-Infinity" xmlns="http://javafx.com/javafx/10.0.2-internal"
@@ -42,9 +42,39 @@
                            GridPane.rowIndex="2"/>
             </GridPane>
         </Tab>
-        <Tab text="File Generation">
+        <Tab text="X-RAY">
             <graphic>
-                <FontIcon iconLiteral="mdi-file-document-box" iconSize="16"/>
+                <FontIcon iconLiteral="mdi-radioactive" iconSize="16"/>
+            </graphic>
+            <GridPane styleClass="bordered-panel">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                    <ColumnConstraints hgrow="NEVER" prefWidth="400.0"/>
+                    <ColumnConstraints hgrow="ALWAYS" prefWidth="30.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
+                </rowConstraints>
+                <Label text="X-Ray Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField promptText="Enter X-Ray file path." GridPane.columnIndex="3" GridPane.rowIndex="1"
+                           fx:id="xRayPathText"/>
+                <Label text="Imaging Code" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="imagingCodeText" promptText="Enter ezyVet imaging code." GridPane.columnIndex="3"
+                           GridPane.rowIndex="2"/>
+                <Label text="Imaging Desc." GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="imagingDescText" promptText="Enter ezyVet imaging description."
+                           GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+            </GridPane>
+        </Tab>
+        <Tab text="DICOM">
+            <graphic>
+                <FontIcon iconLiteral="mdi-microscope" iconSize="16"/>
             </graphic>
             <GridPane styleClass="bordered-panel">
                 <columnConstraints>
@@ -60,19 +90,19 @@
                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
-                    <RowConstraints prefHeight="30.0" vgrow="ALWAYS"/>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
                 </rowConstraints>
-                <Label text="X-Ray Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <TextField promptText="Enter X-Ray file path." GridPane.columnIndex="3" GridPane.rowIndex="1"
-                           fx:id="xRayPathText"/>
-                <Label text="DICOM Path" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Label text="DICOM Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <TextField fx:id="dicomPathText" promptText="Enter DICOM file path." GridPane.columnIndex="3"
+                           GridPane.rowIndex="1"/>
+                <Label text="WL Path" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <TextField fx:id="wlPathText" promptText="Enter work list file path." GridPane.columnIndex="3"
                            GridPane.rowIndex="2"/>
-                <Label text="Imaging Code" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                <TextField fx:id="imagingCodeText" promptText="Enter ezyVet imaging code." GridPane.columnIndex="3"
+                <Label text="DICOM Exec." GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="dicomExecPath" promptText="Enter DICOM executable path." GridPane.columnIndex="3"
                            GridPane.rowIndex="3"/>
-                <Label text="Imaging Desc." GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                <TextField fx:id="imagingDescText" promptText="Enter ezyVet imaging description."
+                <Label text="Exec. Params" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <TextField fx:id="execParamsText" promptText="Enter DICOM executable parameters."
                            GridPane.columnIndex="3" GridPane.rowIndex="4"/>
             </GridPane>
         </Tab>
