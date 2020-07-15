@@ -2,10 +2,7 @@ package org.fifthgen.evervet.ezyvet.api.util;
 
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.APIV1;
-import org.fifthgen.evervet.ezyvet.api.callback.GetBreedCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetContactCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetSexCallback;
-import org.fifthgen.evervet.ezyvet.api.callback.GetSpeciesCallback;
+import org.fifthgen.evervet.ezyvet.api.callback.*;
 import org.fifthgen.evervet.ezyvet.api.model.*;
 import org.fifthgen.evervet.ezyvet.client.ui.util.AtomicProgressCounter;
 
@@ -100,6 +97,34 @@ public class APIHelper {
         } catch (InterruptedException e) {
             log.severe(String.format("Couldn't fetch species for animal nam : %s, ID : %d ", animal.getName(), animal.getId()));
         }
+    }
+
+    /**
+     * Fetch the contact address asynchronously. Make sure to run this in a non UI thread to stop blocking.
+     *
+     * @param contact  Contact object
+     * @param progress Progress counter
+     */
+    public static void fetchCompleteContactSync(final Contact contact, AtomicProgressCounter progress) {
+        APIV1 api = new APIV1();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        // Try setting the physical address of the contact.
+        api.getAddress(contact.getAddressPhysicalId(), new GetAddressCallback() {
+            @Override
+            public void onCompleted(Address address) {
+                contact.setAddressPhysical(address);
+                progress(progress);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.warning(String.format("Failed to fetch address for contact : %s ID : %d", contact.getLastName(), contact.getId()));
+                progress(progress);
+                latch.countDown();
+            }
+        });
     }
 
     /**

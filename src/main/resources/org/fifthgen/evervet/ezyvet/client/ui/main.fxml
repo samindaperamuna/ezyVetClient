@@ -39,7 +39,8 @@
                         <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
-                <MenuItem fx:id="mnuItmDICOM" disable="true" mnemonicParsing="false" text="Generate DICOM Worklist">
+                <MenuItem fx:id="mnuItmDICOM" disable="true" mnemonicParsing="false" onAction="#onDICOMAction"
+                          text="Generate DICOM Worklist">
                     <graphic>
                         <FontIcon iconLiteral="mdi-microscope" iconSize="16"/>
                     </graphic>

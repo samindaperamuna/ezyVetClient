@@ -2,16 +2,26 @@ package org.fifthgen.evervet.ezyvet.client.ui.util;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.client.ui.MainController;
+import org.fifthgen.evervet.ezyvet.client.ui.ProgressController;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ProgressBarHelper {
+@Log
+public class ProgressHelper {
 
     private static final int TIMEOUT = 30000;
     private static final int FADEOUT_TIME = 5000;
@@ -59,6 +69,30 @@ public class ProgressBarHelper {
             NotificationUtil.notifyInfo(context, "X-RAY file generated successfully.");
             fadeOut(context, progressBar);
         }
+    }
+
+    public static ProgressController createProgressView(Stage stage) {
+        ProgressController controller = null;
+        FXMLLoader loader = new FXMLLoader(ProgressHelper.class.getResource("progress.fxml"));
+
+        try {
+            // Load and getOrders the about controller.
+            Parent root = loader.load();
+            controller = loader.getController();
+
+            Stage progressStage = new Stage();
+            progressStage.setScene(new Scene(root));
+            progressStage.initOwner(stage.getOwner());
+            progressStage.setResizable(false);
+            progressStage.initModality(Modality.APPLICATION_MODAL);
+            progressStage.initStyle(StageStyle.UNDECORATED);
+
+            controller.stage = progressStage;
+        } catch (IOException e) {
+            log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
+        }
+
+        return controller;
     }
 
     /**

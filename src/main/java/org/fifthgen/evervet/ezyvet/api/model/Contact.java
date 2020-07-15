@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -61,5 +62,51 @@ public class Contact {
 
     @JsonProperty("ownership_id")
     private Integer ownershipId;
+
+    @JsonIgnore
+    private Address addressPhysical;
+
+    @Override
+    public String toString() {
+        String result = "";
+
+        String firstName = "";
+        String lastName = "";
+        String businessName = "";
+
+        if (this.firstName != null) {
+            firstName = this.firstName.trim();
+        }
+
+        if (this.lastName != null) {
+            lastName = this.lastName.trim();
+        }
+
+        if (this.businessName != null) {
+            businessName = this.businessName.trim();
+        }
+
+        if (!firstName.isEmpty()) {
+            result += firstName;
+
+            if (!lastName.isEmpty()) {
+                result += " " + lastName;
+            }
+
+            if (!businessName.isEmpty()) {
+                result += ", " + businessName;
+            }
+        } else if (!lastName.isEmpty()) {
+            result += lastName;
+
+            if (!businessName.isEmpty()) {
+                result += ", " + businessName;
+            }
+        } else if (!businessName.isEmpty()) {
+            result += businessName;
+        }
+
+        return result;
+    }
 }
 

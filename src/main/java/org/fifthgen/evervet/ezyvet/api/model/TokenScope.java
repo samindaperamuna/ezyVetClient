@@ -6,6 +6,7 @@ public enum TokenScope {
     READ_SEX("read-sex"),
     READ_BREED("read-breed"),
     READ_CONTACT("read-contact"),
+    READ_ADDRESS("read-address"),
     READ_APPOINTMENT("read-appointment"),
     READ_APPOINTMENT_TYPE("read-appointmenttype");
 

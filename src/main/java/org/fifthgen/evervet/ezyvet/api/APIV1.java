@@ -25,6 +25,7 @@ public class APIV1 extends APIBase {
     private static final String SEX_PATH = "/sex";
     private static final String BREED_PATH = "/breed";
     private static final String CONTACT_PATH = "/contact";
+    private static final String ADDRESS_PATH = "/address";
     private static final String APPOINTMENT_TYPE_PATH = "/appointmenttype";
 
     public APIV1() {
@@ -32,7 +33,9 @@ public class APIV1 extends APIBase {
     }
 
     public void getAnimal(int animalId, GetAnimalCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + ANIMAL_PATH + "?id=" + animalId);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + ANIMAL_PATH
+                + "?id=" + animalId);
         sendAPIRequest(getRequest, TokenScope.READ_ANIMAL, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -68,7 +71,8 @@ public class APIV1 extends APIBase {
     }
 
     public void getAnimalList(GetAnimalListCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + ANIMAL_PATH);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + ANIMAL_PATH);
         sendAPIRequest(getRequest, TokenScope.READ_ANIMAL, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -104,7 +108,9 @@ public class APIV1 extends APIBase {
     }
 
     public void getSpecies(int speciesId, GetSpeciesCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + SPECIES_PATH + "?id=" + speciesId);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + SPECIES_PATH
+                + "?id=" + speciesId);
         sendAPIRequest(getRequest, TokenScope.READ_SPECIES, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -140,7 +146,9 @@ public class APIV1 extends APIBase {
     }
 
     public void getSex(int sexId, GetSexCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + SEX_PATH + "?id=" + sexId);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + SEX_PATH
+                + "?id=" + sexId);
         sendAPIRequest(getRequest, TokenScope.READ_SEX, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -176,7 +184,9 @@ public class APIV1 extends APIBase {
     }
 
     public void getBreed(int breedId, GetBreedCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + BREED_PATH + "?id=" + breedId);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + BREED_PATH
+                + "?id=" + breedId);
         sendAPIRequest(getRequest, TokenScope.READ_BREED, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -211,8 +221,49 @@ public class APIV1 extends APIBase {
         });
     }
 
+    public void getContactList(boolean isVet, boolean isActive, GetContactListCallback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + CONTACT_PATH
+                + "?is_vet=" + isVet
+                + "&active=" + isActive);
+        sendAPIRequest(getRequest, TokenScope.READ_CONTACT, new ConnectCallback() {
+            @Override
+            public void onCompleted(HttpResponse response, CountDownLatch latch) {
+                HttpEntity entity = response.getEntity();
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+
+                try {
+                    JsonNode node = mapper.readTree(EntityUtils.toString(entity));
+                    JsonNode itemsNode = node.path("items");
+
+                    List<Contact> contacts = new ArrayList<>();
+                    for (JsonNode itemNode : itemsNode) {
+                        contacts.add(mapper.readerFor(Contact.class).readValue(itemNode.get("contact")));
+                    }
+
+                    callback.onCompleted(contacts);
+                } catch (IOException e) {
+                    String msg = "Couldn't convert response into a contact object.";
+                    log.severe(msg + ": \n" + e.getLocalizedMessage());
+                    callback.onFailed(e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Exception in request: \n" + e.getLocalizedMessage());
+                callback.onFailed(e);
+            }
+        });
+    }
+
     public void getContact(int contactId, GetContactCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + CONTACT_PATH + "?id=" + contactId);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + CONTACT_PATH
+                + "?id=" + contactId);
         sendAPIRequest(getRequest, TokenScope.READ_CONTACT, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -247,8 +298,47 @@ public class APIV1 extends APIBase {
         });
     }
 
+    public void getAddress(int addressId, GetAddressCallback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + ADDRESS_PATH
+                + "?id=" + addressId);
+        sendAPIRequest(getRequest, TokenScope.READ_ADDRESS, new ConnectCallback() {
+            @Override
+            public void onCompleted(HttpResponse response, CountDownLatch latch) {
+                HttpEntity entity = response.getEntity();
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+
+                try {
+                    JsonNode node = mapper.readTree(EntityUtils.toString(entity));
+                    JsonNode itemsNode = node.path("items");
+
+                    List<Address> addresses = new ArrayList<>();
+                    for (JsonNode itemNode : itemsNode) {
+                        addresses.add(mapper.readerFor(Address.class).readValue(itemNode.get("address")));
+                    }
+
+                    callback.onCompleted(addresses.get(0));
+                } catch (IOException e) {
+                    String msg = "Couldn't convert response into an address object.";
+                    log.severe(msg + ": \n" + e.getLocalizedMessage());
+                    callback.onFailed(e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Exception in request: \n" + e.getLocalizedMessage());
+                callback.onFailed(e);
+            }
+        });
+    }
+
     public void getAppointmentTypeList(GetAppointmentTypeListCallback callback) {
-        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey()) + API_VERSION + APPOINTMENT_TYPE_PATH);
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + APPOINTMENT_TYPE_PATH);
         sendAPIRequest(getRequest, TokenScope.READ_APPOINTMENT_TYPE, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {

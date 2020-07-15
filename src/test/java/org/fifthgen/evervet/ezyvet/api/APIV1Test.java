@@ -12,6 +12,8 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.fifthgen.evervet.ezyvet.TestContext.*;
+
 public class APIV1Test {
 
     @Rule
@@ -47,7 +49,7 @@ public class APIV1Test {
 
     @Test
     public void getAnimalTest() {
-        api.getAnimal(1, new GetAnimalCallback() {
+        api.getAnimal(ANIMAL_ID, new GetAnimalCallback() {
             @Override
             public void onCompleted(Animal animal) {
                 Assert.assertNotNull(animal);
@@ -81,7 +83,7 @@ public class APIV1Test {
 
     @Test
     public void getSpeciesTest() {
-        api.getSpecies(1, new GetSpeciesCallback() {
+        api.getSpecies(SPECIES_ID, new GetSpeciesCallback() {
             @Override
             public void onCompleted(Species species) {
                 Assert.assertNotNull(species);
@@ -98,7 +100,7 @@ public class APIV1Test {
 
     @Test
     public void getSexTest() {
-        api.getSex(1, new GetSexCallback() {
+        api.getSex(SEX_ID, new GetSexCallback() {
             @Override
             public void onCompleted(Sex sex) {
                 Assert.assertNotNull(sex);
@@ -115,7 +117,7 @@ public class APIV1Test {
 
     @Test
     public void getBreedTest() {
-        api.getBreed(628, new GetBreedCallback() {
+        api.getBreed(BREED_ID, new GetBreedCallback() {
             @Override
             public void onCompleted(Breed breed) {
                 Assert.assertNotNull(breed);
@@ -131,8 +133,25 @@ public class APIV1Test {
     }
 
     @Test
+    public void getContactListTest() {
+        api.getContactList(true, true, new GetContactListCallback() {
+            @Override
+            public void onCompleted(List<Contact> contactList) {
+                Assert.assertNotNull(contactList);
+                testContext.log.info("Fetch contact list complete : " + Arrays.toString(contactList.toArray()));
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch contact list: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
     public void getContactTest() {
-        api.getContact(24, new GetContactCallback() {
+        api.getContact(CONTACT_ID, new GetContactCallback() {
             @Override
             public void onCompleted(Contact contact) {
                 Assert.assertNotNull(contact);
@@ -143,6 +162,23 @@ public class APIV1Test {
             public void onFailed(Exception e) {
                 exception.expect(Exception.class);
                 testContext.log.severe("Failed to fetch contact: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
+    public void getAddressTest() {
+        api.getAddress(ADDRESS_ID, new GetAddressCallback() {
+            @Override
+            public void onCompleted(Address address) {
+                Assert.assertNotNull(address);
+                testContext.log.info("Fetch address complete : " + address.toString());
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch address: " + e.getLocalizedMessage());
             }
         });
     }

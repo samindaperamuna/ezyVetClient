@@ -26,7 +26,7 @@ import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
 import org.fifthgen.evervet.ezyvet.client.ui.factory.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
-import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressBarHelper;
+import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
 import org.fifthgen.evervet.ezyvet.client.util.XRAYGenerator;
 import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
 
@@ -98,7 +98,7 @@ public class MainController implements Initializable {
      * Fetch the appointment types from the API. Does this on a background thread to prevent locking of the UI thread.
      */
     private void fetchAppointmentTypes() {
-        notificationLabel.setText("Fetching appointment types. Please wait!");
+        NotificationUtil.notifyInfo(this, "Fetching appointment types. Please wait!");
 
         new Thread(() -> {
             APIV1 api = new APIV1();
@@ -151,14 +151,42 @@ public class MainController implements Initializable {
         if (!appointmentsTable.getSelectionModel().isEmpty()) {
             AppointmentV2 appointment = appointmentsTable.getSelectionModel().getSelectedItem();
 
-            ProgressBarHelper.initProgressBar(this);
+            ProgressHelper.initProgressBar(this);
 
             XRAYGenerator generator = new XRAYGenerator();
-            generator.getProgress().setPropertyChangeListener(event -> ProgressBarHelper.setProgress(this, event));
-            generator.generateXRAYFile(appointment.getAnimal());
+            generator.getProgress().setPropertyChangeListener(event -> ProgressHelper.setProgress(this, event));
+            generator.generateFile(appointment.getAnimal());
         } else {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this, "Please select a row first!");
+        }
+    }
+
+    @FXML
+    private void onDICOMAction() {
+        if (!appointmentsTable.getSelectionModel().isEmpty()) {
+            AppointmentV2 appointment = appointmentsTable.getSelectionModel().getSelectedItem();
+            FXMLLoader loader = new FXMLLoader(MainController.this.getClass().getResource("dicom.fxml"));
+
+            try {
+                // Load DICOM controller.
+                Parent root = loader.load();
+                DICOMController controller = loader.getController();
+
+                Stage dicomStage = new Stage();
+
+                // Set dicomStage.
+                controller.stage = dicomStage;
+                controller.init(this, appointment.getAnimal());
+
+                dicomStage.setScene(new Scene(root));
+                dicomStage.initOwner(stage.getOwner());
+                dicomStage.setResizable(false);
+                dicomStage.initModality(Modality.APPLICATION_MODAL);
+                dicomStage.initStyle(StageStyle.UNIFIED);
+            } catch (IOException e) {
+                log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
+            }
         }
     }
 
@@ -196,7 +224,7 @@ public class MainController implements Initializable {
     private void onSearchAction() {
         toggleDisableMenuItems(true);
 
-        ProgressController controller = createProgressView();
+        ProgressController controller = ProgressHelper.createProgressView(this.stage);
         controller.stage.show();
 
         // Handles the progress window.
@@ -314,7 +342,7 @@ public class MainController implements Initializable {
                         NotificationUtil.notifyInfo(MainController.this, "No appointments were found");
                     }
 
-                    // CCount down progress latch.
+                    // Count down progress latch.
                     progressLatch.countDown();
                 }
 
@@ -324,7 +352,7 @@ public class MainController implements Initializable {
                     log.severe(msg + " :" + e.getLocalizedMessage());
                     NotificationUtil.notifyError(MainController.this, msg);
 
-                    // CCount down progress latch.
+                    // Count down progress latch.
                     progressLatch.countDown();
                 }
             });
@@ -338,6 +366,8 @@ public class MainController implements Initializable {
                 log.warning("Failed to close the progress latch.");
             } finally {
                 Platform.runLater(controller.stage::close);
+                // TODO : Remove requesting for next pulse.
+                Platform.requestNextPulse();
             }
         });
     }
@@ -352,29 +382,29 @@ public class MainController implements Initializable {
         }
     }
 
-    private ProgressController createProgressView() {
-        ProgressController controller = null;
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("progress.fxml"));
-
-        try {
-            // Load and getOrders the about controller.
-            Parent root = loader.load();
-            controller = loader.getController();
-
-            Stage progressStage = new Stage();
-            progressStage.setScene(new Scene(root));
-            progressStage.initOwner(stage.getOwner());
-            progressStage.setResizable(false);
-            progressStage.initModality(Modality.APPLICATION_MODAL);
-            progressStage.initStyle(StageStyle.UNDECORATED);
-
-            controller.stage = progressStage;
-        } catch (IOException e) {
-            log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
-        }
-
-        return controller;
-    }
+//    private ProgressController createProgressView() {
+//        ProgressController controller = null;
+//        FXMLLoader loader = new FXMLLoader(getClass().getResource("progress.fxml"));
+//
+//        try {
+//            // Load and getOrders the about controller.
+//            Parent root = loader.load();
+//            controller = loader.getController();
+//
+//            Stage progressStage = new Stage();
+//            progressStage.setScene(new Scene(root));
+//            progressStage.initOwner(stage.getOwner());
+//            progressStage.setResizable(false);
+//            progressStage.initModality(Modality.APPLICATION_MODAL);
+//            progressStage.initStyle(StageStyle.UNDECORATED);
+//
+//            controller.stage = progressStage;
+//        } catch (IOException e) {
+//            log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
+//        }
+//
+//        return controller;
+//    }
 
     /**
      * This class detects the current status of internet connection.
