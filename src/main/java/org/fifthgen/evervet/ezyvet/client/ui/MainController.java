@@ -24,7 +24,7 @@ import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentV2Callback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
-import org.fifthgen.evervet.ezyvet.client.ui.factory.TableFactory;
+import org.fifthgen.evervet.ezyvet.client.ui.support.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
 import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
 import org.fifthgen.evervet.ezyvet.client.util.XRAYGenerator;
@@ -53,6 +53,7 @@ public class MainController implements Initializable {
     private MenuItem mnuItmXRay;
 
     @FXML
+    @Getter
     private MenuItem mnuItmDICOM;
 
     @FXML
@@ -155,7 +156,7 @@ public class MainController implements Initializable {
 
             XRAYGenerator generator = new XRAYGenerator();
             generator.getProgress().setPropertyChangeListener(event -> ProgressHelper.setProgress(this, event));
-            generator.generateFile(appointment.getAnimal());
+            generator.generateFile(appointment.getAnimal(), null);
         } else {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this, "Please select a row first!");
@@ -366,8 +367,6 @@ public class MainController implements Initializable {
                 log.warning("Failed to close the progress latch.");
             } finally {
                 Platform.runLater(controller.stage::close);
-                // TODO : Remove requesting for next pulse.
-                Platform.requestNextPulse();
             }
         });
     }
@@ -381,30 +380,6 @@ public class MainController implements Initializable {
             mnuItmDICOM.setDisable(disable);
         }
     }
-
-//    private ProgressController createProgressView() {
-//        ProgressController controller = null;
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("progress.fxml"));
-//
-//        try {
-//            // Load and getOrders the about controller.
-//            Parent root = loader.load();
-//            controller = loader.getController();
-//
-//            Stage progressStage = new Stage();
-//            progressStage.setScene(new Scene(root));
-//            progressStage.initOwner(stage.getOwner());
-//            progressStage.setResizable(false);
-//            progressStage.initModality(Modality.APPLICATION_MODAL);
-//            progressStage.initStyle(StageStyle.UNDECORATED);
-//
-//            controller.stage = progressStage;
-//        } catch (IOException e) {
-//            log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
-//        }
-//
-//        return controller;
-//    }
 
     /**
      * This class detects the current status of internet connection.

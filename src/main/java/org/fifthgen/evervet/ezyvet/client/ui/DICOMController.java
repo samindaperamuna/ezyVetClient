@@ -3,6 +3,7 @@ package org.fifthgen.evervet.ezyvet.client.ui;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.stage.Stage;
@@ -12,6 +13,7 @@ import org.fifthgen.evervet.ezyvet.api.callback.GetContactListCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
 import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
 import org.fifthgen.evervet.ezyvet.client.util.DICOMGenerator;
@@ -66,11 +68,37 @@ public class DICOMController {
                     Platform.runLater(stage::close);
                 }
             });
-            generator.generateFile(this.animal);
+
+            generator.generateFile(this.animal, new StreamReaderCallback() {
+
+                @Override
+                public void onStdError(String msg) {
+                    Platform.runLater(() -> NotificationUtil.showAlert(Alert.AlertType.ERROR,
+                            "An error occurred while converting the dump.",
+                            "The standard error from the process :",
+                            msg));
+                }
+
+                @Override
+                public void onStdOut(String msg) {
+                    Platform.runLater(() -> NotificationUtil.showAlert(Alert.AlertType.INFORMATION,
+                            "Dump successfully converted to DICOM format.",
+                            "The standard output from the process :",
+                            msg));
+                }
+
+                @Override
+                public void onFailed(Exception e) {
+                    String msg = "Failed to fetch the process output : " + e.getLocalizedMessage();
+                    log.severe(msg);
+                    NotificationUtil.notifyError(parent, msg);
+                }
+            });
         } else {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this.parent, "Please select a row first!");
         }
+
     }
 
     /**
@@ -82,33 +110,31 @@ public class DICOMController {
 
         APIV1 api = new APIV1();
         Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            api.getContactList(true, true, new GetContactListCallback() {
-                @Override
-                public void onCompleted(List<Contact> contactList) {
-                    Platform.runLater(() -> {
-                        vetChoiceBox.setItems(FXCollections.observableList(contactList));
-                        vetChoiceBox.getSelectionModel().selectFirst();
-                    });
+        executor.execute(() -> api.getContactList(true, true, new GetContactListCallback() {
+            @Override
+            public void onCompleted(List<Contact> contactList) {
+                Platform.runLater(() -> {
+                    vetChoiceBox.setItems(FXCollections.observableList(contactList));
+                    vetChoiceBox.getSelectionModel().selectFirst();
+                });
 
-                    Platform.runLater(() -> {
-                        progress.stage.close();
-                        stage.show();
-                    });
-                }
+                Platform.runLater(() -> {
+                    progress.stage.close();
+                    stage.show();
+                });
+            }
 
-                @Override
-                public void onFailed(Exception e) {
-                    String msg = "Failed to fetch active vets";
-                    log.severe(msg + " :" + e.getLocalizedMessage());
+            @Override
+            public void onFailed(Exception e) {
+                String msg = "Failed to fetch active vets";
+                log.severe(msg + " :" + e.getLocalizedMessage());
 
-                    Platform.runLater(() -> {
-                        progress.stage.close();
-                        stage.close();
-                    });
-                }
-            });
-        });
+                Platform.runLater(() -> {
+                    progress.stage.close();
+                    stage.close();
+                });
+            }
+        }));
     }
 
     private void disableControls(boolean disable) {

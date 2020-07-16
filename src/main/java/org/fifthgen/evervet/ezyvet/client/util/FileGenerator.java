@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.util.APIHelper;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.util.AtomicProgressCounter;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
 import org.fifthgen.evervet.ezyvet.util.PropertyManager;
@@ -23,6 +24,7 @@ public abstract class FileGenerator {
 
     protected static final String TIME_FORMAT = "HH:mm:ss";
     protected static final String FILE_PATTERN = "%s" + File.separator + "%s_%s_%s_%s.%s";
+
     @Getter
     protected final AtomicProgressCounter progress;
     protected String extension;
@@ -46,6 +48,8 @@ public abstract class FileGenerator {
     protected Path dirPath;
     protected File file;
 
+    protected StreamReaderCallback callback;
+
     protected FileGenerator() {
         PropertyManager propertyManager = PropertyManager.getInstance();
         this.progress = new AtomicProgressCounter();
@@ -53,8 +57,9 @@ public abstract class FileGenerator {
         this.ezyVetCode = propertyManager.getProperty(PropertyKey.IMAGING_CODE.getKey());
     }
 
-    public void generateFile(final Animal animal) {
+    public void generateFile(final Animal animal, StreamReaderCallback callback) {
         this.animal = animal;
+        this.callback = callback;
 
         new Thread(() -> generateDataProgress(animal)).start();
     }

@@ -6,15 +6,21 @@ import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc.Modality;
 import org.fifthgen.evervet.ezyvet.api.util.APIHelper;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
 import org.fifthgen.evervet.ezyvet.util.PropertyManager;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Log
 public class DICOMGenerator extends FileGenerator {
@@ -36,7 +42,7 @@ public class DICOMGenerator extends FileGenerator {
         this.ezyVetModality = dicomDesc.getModality();
         this.ezyVetVet = ezyVetVet;
 
-        extension = "txt";
+        extension = "dump";
     }
 
     /**
@@ -140,20 +146,21 @@ public class DICOMGenerator extends FileGenerator {
                 convertToWorklist();
                 progressComplete();
             }
-        } catch (IOException e) {
-            log.severe("Failed to create new file : " + e.getLocalizedMessage());
-            progress.setErrorMsg("Failed to create new file");
+        } catch (IOException | InterruptedException e) {
+            String msg = "Failed to create new file : " + e.getLocalizedMessage();
+            log.severe(msg);
+            progress.setErrorMsg(msg);
             progressComplete();
         }
     }
 
-    private void convertToWorklist() {
+    private void convertToWorklist() throws IOException, InterruptedException {
         PropertyManager properties = PropertyManager.getInstance();
 
         String exec = properties.getProperty(PropertyKey.DICOM_EXEC.getKey());
         String params = properties.getProperty(PropertyKey.DICOM_PARAMS.getKey());
-        String dicomPath = properties.getProperty(PropertyKey.DICOM_PATH.getKey());
-        String wlPath = properties.getProperty(PropertyKey.WL_PATH.getKey());
+        String dicomPath = file.getPath();
+        String wlPath = properties.getProperty(PropertyKey.WL_PATH.getKey()) + "/" + file.getName().replace(extension, "wl");
 
         List<String> commands = new ArrayList<>();
         commands.add(exec);
@@ -161,11 +168,35 @@ public class DICOMGenerator extends FileGenerator {
         commands.add(dicomPath);
         commands.add(wlPath);
 
-        try {
-            Process process = new ProcessBuilder(commands).start();
-            process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        Process process = new ProcessBuilder(commands).start();
+
+        readInputStream(process.getErrorStream(), callback, true);
+        readInputStream(process.getInputStream(), callback, false);
+        process.waitFor();
+    }
+
+    private void readInputStream(InputStream stream, StreamReaderCallback callback, boolean isStdErr) {
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try (BufferedReader err = new BufferedReader(new InputStreamReader(stream))) {
+                final StringBuilder buffer = new StringBuilder();
+                String line;
+
+                while ((line = err.readLine()) != null) {
+                    buffer.append(line).append(LINE_END);
+                }
+
+                String msg = buffer.toString();
+
+                if (isStdErr && !msg.isEmpty()) {
+                    callback.onStdError(msg);
+                } else if (!msg.isEmpty()) {
+                    callback.onStdOut(msg);
+                }
+            } catch (IOException e) {
+                log.warning("Failed to read input stream content : " + e.getLocalizedMessage());
+                callback.onFailed(e);
+            }
+        });
     }
 }

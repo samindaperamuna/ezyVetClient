@@ -1,4 +1,4 @@
-package org.fifthgen.evervet.ezyvet.client.ui.factory;
+package org.fifthgen.evervet.ezyvet.client.ui.support;
 
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;

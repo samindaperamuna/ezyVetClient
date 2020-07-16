@@ -2,10 +2,12 @@ package org.fifthgen.evervet.ezyvet.client.ui.util;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.client.ui.MainController;
+import org.fifthgen.evervet.ezyvet.client.ui.support.InfoNode;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,6 +63,19 @@ public class NotificationUtil {
                     });
                 }
             }, FADEOUT_TIME);
+        });
+    }
+
+    public static void showAlert(Alert.AlertType type, String title, String header, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setHeaderText(title);
+
+            InfoNode node = new InfoNode();
+            node.setLabelText(header);
+            node.setTextAreaText(message);
+            alert.getDialogPane().setExpandableContent(node);
+            alert.show();
         });
     }
 }

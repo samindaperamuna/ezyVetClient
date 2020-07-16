@@ -38,10 +38,7 @@ public class ProgressHelper {
             fadeIn.setToValue(1.0);
             fadeIn.play();
 
-            fadeIn.setOnFinished(actionEvent -> {
-                MenuItem xrayMenu = context.getMnuItmXRay();
-                xrayMenu.setDisable(true);
-            });
+            fadeIn.setOnFinished(actionEvent -> toggleMenus(context, true));
         });
 
         // Fail-safe
@@ -66,7 +63,7 @@ public class ProgressHelper {
         }
 
         if (progressBar.getProgress() == 1.0) {
-            NotificationUtil.notifyInfo(context, "X-RAY file generated successfully.");
+            NotificationUtil.notifyInfo(context, "File generated successfully.");
             fadeOut(context, progressBar);
         }
     }
@@ -113,13 +110,19 @@ public class ProgressHelper {
                     fadeOut.play();
 
                     fadeOut.setOnFinished(actionEvent -> {
-                        MenuItem xrayMenu = context.getMnuItmXRay();
-                        xrayMenu.setDisable(false);
+                        toggleMenus(context, false);
 
                         progressBar.setVisible(false);
                     });
                 });
             }
         }, FADEOUT_TIME);
+    }
+
+    private static void toggleMenus(MainController context, boolean disable) {
+        MenuItem xrayMenu = context.getMnuItmXRay();
+        MenuItem dicomMenu = context.getMnuItmDICOM();
+        xrayMenu.setDisable(disable);
+        dicomMenu.setDisable(disable);
     }
 }
