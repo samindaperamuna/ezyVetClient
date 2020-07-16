@@ -22,7 +22,7 @@ import java.time.format.FormatStyle;
 @Log
 public abstract class FileGenerator {
 
-    protected static final String TIME_FORMAT = "HH:mm:ss";
+    protected static final String TIME_FORMAT = "HH-mm-ss";
     protected static final String FILE_PATTERN = "%s" + File.separator + "%s_%s_%s_%s.%s";
 
     @Getter
