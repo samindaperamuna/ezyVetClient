@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.client;
 
+import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -7,15 +8,11 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.fifthgen.evervet.ezyvet.client.ui.MainController;
 
-public class Application extends javafx.application.Application {
+public class EvervetClient extends Application {
 
     private final static String STAGE_TITLE = "Evervet - ezyVet Client";
     private final static int WIDTH = 800;
     private final static int HEIGHT = 600;
-
-    public static void main(String... args) {
-        launch(args);
-    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {

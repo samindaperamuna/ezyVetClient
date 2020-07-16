@@ -7,6 +7,7 @@
     <groupId>org.fifthgen</groupId>
     <artifactId>evervet.ezyvet.client</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -122,6 +123,28 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.fifthgen.evervet.ezyvet.client.EvervetClient</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
@@ -142,6 +165,7 @@
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <trimStackTrace>false</trimStackTrace>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
             <plugin>
@@ -149,7 +173,18 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.3</version>
                 <configuration>
-                    <mainClass>org.fifthgen.evervet.ezyvet.client.Application</mainClass>
+                    <mainClass>org.fifthgen.evervet.ezyvet.client.EvervetClient</mainClass>
+                    <launcher>launch</launcher>
+                    <compress>2</compress>
+                    <jlinkZipName>ezyVetEvervetClient</jlinkZipName>
+                    <jlinkImageName>ezyVetEvervetClient</jlinkImageName>
+
+                    <!-- decrease executable size -->
+                    <noManPages>true</noManPages>
+                    <noHeaderFiles>true</noHeaderFiles>
+
+                    <!-- any commandline arguments for java executable -->
+                    <options></options>
                 </configuration>
             </plugin>
         </plugins>

@@ -16,6 +16,7 @@ module ezyVet.Client.Evervet {
     exports org.fifthgen.evervet.ezyvet.client;
     exports org.fifthgen.evervet.ezyvet.api;
     exports org.fifthgen.evervet.ezyvet.api.callback;
+    exports org.fifthgen.evervet.ezyvet.api.model;
 
     opens org.fifthgen.evervet.ezyvet.api.model to javafx.base, com.fasterxml.jackson.databind;
     opens org.fifthgen.evervet.ezyvet.client.ui to javafx.fxml;
