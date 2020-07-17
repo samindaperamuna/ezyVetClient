@@ -66,10 +66,16 @@
                     <Insets right="10.0" top="10.0"/>
                 </GridPane.margin>
 
-                <Button fx:id="generateButton" disable="true" onAction="#onGenerateAction" prefWidth="125.0"
+                <Button fx:id="generateButton" disable="true" onAction="#onGenerateAction" prefWidth="120.0"
                         text="Generate File">
                     <HBox.margin>
                         <Insets left="20.0"/>
+                    </HBox.margin>
+                </Button>
+
+                <Button cancelButton="true" prefWidth="120.0" text="Cancel">
+                    <HBox.margin>
+                        <Insets left="10.0"/>
                     </HBox.margin>
                 </Button>
             </HBox>

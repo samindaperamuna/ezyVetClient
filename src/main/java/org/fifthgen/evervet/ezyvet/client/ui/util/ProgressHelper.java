@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.Modality;
@@ -119,10 +120,19 @@ public class ProgressHelper {
         }, FADEOUT_TIME);
     }
 
+    /**
+     * Enable / disable menus and context menus that might cause issues with the async http requests.
+     *
+     * @param context MainController instance.
+     * @param disable Whether to disable the menu.
+     */
     private static void toggleMenus(MainController context, boolean disable) {
         MenuItem xrayMenu = context.getMnuItmXRay();
         MenuItem dicomMenu = context.getMnuItmDICOM();
+        ContextMenu ctxMenu = context.getTableContextMenu();
+
         xrayMenu.setDisable(disable);
         dicomMenu.setDisable(disable);
+        ctxMenu.getItems().forEach(item -> item.setDisable(disable));
     }
 }

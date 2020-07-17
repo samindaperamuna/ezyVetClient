@@ -1,4 +1,4 @@
-module ezyVet.Client.Evervet {
+module evervet.ezyvet {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.logging;
@@ -13,11 +13,12 @@ module ezyVet.Client.Evervet {
     requires org.kordamp.ikonli.javafx;
     requires static lombok;
 
-    exports org.fifthgen.evervet.ezyvet.client;
     exports org.fifthgen.evervet.ezyvet.api;
     exports org.fifthgen.evervet.ezyvet.api.callback;
     exports org.fifthgen.evervet.ezyvet.api.model;
 
-    opens org.fifthgen.evervet.ezyvet.api.model to javafx.base, com.fasterxml.jackson.databind;
+    exports org.fifthgen.evervet.ezyvet.client to javafx.graphics;
+
     opens org.fifthgen.evervet.ezyvet.client.ui to javafx.fxml;
+    opens org.fifthgen.evervet.ezyvet.api.model to com.fasterxml.jackson.databind;
 }

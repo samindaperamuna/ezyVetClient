@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -29,6 +30,7 @@ import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
 import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
 import org.fifthgen.evervet.ezyvet.client.util.XRAYGenerator;
 import org.fifthgen.evervet.ezyvet.util.ConnectionManager;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
@@ -76,12 +78,34 @@ public class MainController implements Initializable {
     @FXML
     private Label netStatLabel;
 
+    @Getter
+    private ContextMenu tableContextMenu;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
         exec.scheduleAtFixedRate(new NetStatUpdater(), 0, EXECUTOR_DELAY, TimeUnit.SECONDS);
 
         addManualAppointmentType();
+        addContextMenu();
+    }
+
+    /**
+     * Create and add context menu to the appointments table.
+     */
+    private void addContextMenu() {
+        tableContextMenu = new ContextMenu();
+
+        MenuItem xrayCtxMnuItem = new MenuItem("Generate X-RAY Input");
+        xrayCtxMnuItem.setGraphic(new FontIcon("mdi-radioactive"));
+        xrayCtxMnuItem.setOnAction(actionEvent -> this.onXRAYAction());
+
+        MenuItem dicomCtxMnuItem = new MenuItem("Generate DICOM Worklist");
+        dicomCtxMnuItem.setGraphic(new FontIcon("mdi-microscope"));
+        dicomCtxMnuItem.setOnAction(actionEvent -> this.onDICOMAction());
+
+        tableContextMenu.getItems().add(xrayCtxMnuItem);
+        tableContextMenu.getItems().add(dicomCtxMnuItem);
     }
 
     /**
@@ -254,9 +278,13 @@ public class MainController implements Initializable {
                         if (!row.isEmpty()) {
                             toggleDisableMenuItems(false);
 
-                            if (event.getClickCount() == 2) {
-                                AppointmentV2 appointment = row.getItem();
-                                //viewOrder(summary.getOrderId());
+                            if (event.getButton() == MouseButton.PRIMARY) {
+                                if (event.getClickCount() == 2) {
+                                    AppointmentV2 appointment = row.getItem();
+                                    // viewOrder(summary.getOrderId());
+                                }
+                            } else if (event.getButton() == MouseButton.SECONDARY) {
+                                tableContextMenu.show(row, event.getScreenX(), event.getScreenY());
                             }
                         }
                     });
