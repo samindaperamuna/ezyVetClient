@@ -86,12 +86,20 @@
                 <GridPane.margin>
                     <Insets left="10.0" right="10.0" top="10.0"/>
                 </GridPane.margin>
+                <Button fx:id="previousNavButton" onAction="#onNavigationButtonPress">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi-skip-previous-circle-outline" iconSize="16"/>
+                    </graphic>
+                    <HBox.margin>
+                        <Insets right="20.0"/>
+                    </HBox.margin>
+                </Button>
                 <Label text="Date :">
                     <HBox.margin>
-                        <Insets left="20.0" right="20.0"/>
+                        <Insets right="20.0"/>
                     </HBox.margin>
                 </Label>
-                <DatePicker fx:id="appointmentDatePicker" prefWidth="200.0">
+                <DatePicker fx:id="appointmentDatePicker" prefWidth="175.0">
                     <HBox.margin>
                         <Insets left="20" right="20.0"/>
                     </HBox.margin>
@@ -101,12 +109,23 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </Label>
-                <ComboBox fx:id="appointmentTypeCombo" prefWidth="200.0">
+                <ComboBox fx:id="appointmentTypeCombo" prefWidth="175.0">
                     <HBox.margin>
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </ComboBox>
-                <Button alignment="CENTER" mnemonicParsing="false" onAction="#onSearchAction" text="Search"/>
+                <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                    <Button fx:id="searchButton" alignment="CENTER" mnemonicParsing="false" onAction="#onSearchAction"
+                            prefWidth="75.0" text="Search"/>
+                    <Button fx:id="nextNavButton" onAction="#onNavigationButtonPress">
+                        <HBox.margin>
+                            <Insets left="10.0"/>
+                        </HBox.margin>
+                        <graphic>
+                            <FontIcon iconLiteral="mdi-skip-next-circle-outline" iconSize="16"/>
+                        </graphic>
+                    </Button>
+                </HBox>
             </HBox>
             <TableView fx:id="appointmentsTable" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                 <columnResizePolicy>

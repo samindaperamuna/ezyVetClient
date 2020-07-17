@@ -5,7 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.APIV1;
@@ -32,10 +32,10 @@ public class DICOMController {
     private Animal animal;
 
     @FXML
-    private ChoiceBox<Contact> vetChoiceBox;
+    private ComboBox<Contact> vetComboBox;
 
     @FXML
-    private ChoiceBox<DICOMDesc> descChoiceBox;
+    private ComboBox<DICOMDesc> descComboBox;
 
     @FXML
     private Button generateButton;
@@ -46,16 +46,15 @@ public class DICOMController {
 
         fetchActiveVets();
         fetchStudyDescriptions();
-        generateButton.setDisable(false);
     }
 
     @FXML
     public void onGenerateAction() {
-        if (!vetChoiceBox.getSelectionModel().isEmpty() && !descChoiceBox.getSelectionModel().isEmpty()) {
+        if (!vetComboBox.getSelectionModel().isEmpty() && !descComboBox.getSelectionModel().isEmpty()) {
             disableControls(true);
 
-            Contact vet = vetChoiceBox.getValue();
-            DICOMDesc desc = descChoiceBox.getValue();
+            Contact vet = vetComboBox.getValue();
+            DICOMDesc desc = descComboBox.getValue();
 
             ProgressHelper.initProgressBar(parent);
 
@@ -98,7 +97,11 @@ public class DICOMController {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this.parent, "Please select a row first!");
         }
+    }
 
+    @FXML
+    public void onCancelButtonAction() {
+        stage.close();
     }
 
     /**
@@ -113,10 +116,7 @@ public class DICOMController {
         executor.execute(() -> api.getContactList(true, true, new GetContactListCallback() {
             @Override
             public void onCompleted(List<Contact> contactList) {
-                Platform.runLater(() -> {
-                    vetChoiceBox.setItems(FXCollections.observableList(contactList));
-                    vetChoiceBox.getSelectionModel().selectFirst();
-                });
+                Platform.runLater(() -> vetComboBox.setItems(FXCollections.observableList(contactList)));
 
                 Platform.runLater(() -> {
                     progress.stage.close();
@@ -137,9 +137,16 @@ public class DICOMController {
         }));
     }
 
+    @FXML
+    private void onSelectionChanged() {
+        if (!vetComboBox.getSelectionModel().isEmpty() && !descComboBox.getSelectionModel().isEmpty()) {
+            this.generateButton.setDisable(false);
+        }
+    }
+
     private void disableControls(boolean disable) {
-        this.vetChoiceBox.setDisable(disable);
-        this.descChoiceBox.setDisable(disable);
+        this.vetComboBox.setDisable(disable);
+        this.descComboBox.setDisable(disable);
         this.generateButton.setDisable(disable);
     }
 
@@ -147,7 +154,6 @@ public class DICOMController {
      * Load the study descriptions from {@link DICOMDesc} enumeration.
      */
     private void fetchStudyDescriptions() {
-        descChoiceBox.setItems(FXCollections.observableList(Arrays.asList(DICOMDesc.values())));
-        descChoiceBox.getSelectionModel().selectFirst();
+        descComboBox.setItems(FXCollections.observableList(Arrays.asList(DICOMDesc.values())));
     }
 }

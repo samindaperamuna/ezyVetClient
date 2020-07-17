@@ -38,11 +38,12 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </Label>
-                <ChoiceBox fx:id="vetChoiceBox" prefWidth="250.0">
+                <ComboBox fx:id="vetComboBox" onAction="#onSelectionChanged" prefWidth="250.0"
+                          promptText="-- Please Select -- ">
                     <HBox.margin>
                         <Insets left="20.0"/>
                     </HBox.margin>
-                </ChoiceBox>
+                </ComboBox>
             </HBox>
             <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                 <GridPane.margin>
@@ -54,11 +55,12 @@
                         <Insets left="20.0" right="20.0"/>
                     </HBox.margin>
                 </Label>
-                <ChoiceBox fx:id="descChoiceBox" prefWidth="250.0">
+                <ComboBox fx:id="descComboBox" onAction="#onSelectionChanged" prefWidth="250.0"
+                          promptText="-- Please Select -- ">
                     <HBox.margin>
                         <Insets left="20.0"/>
                     </HBox.margin>
-                </ChoiceBox>
+                </ComboBox>
             </HBox>
 
             <HBox alignment="CENTER_RIGHT" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
@@ -66,14 +68,15 @@
                     <Insets right="10.0" top="10.0"/>
                 </GridPane.margin>
 
-                <Button fx:id="generateButton" disable="true" onAction="#onGenerateAction" prefWidth="120.0"
+                <Button fx:id="generateButton" defaultButton="true" disable="true" onAction="#onGenerateAction"
+                        prefWidth="120.0"
                         text="Generate File">
                     <HBox.margin>
                         <Insets left="20.0"/>
                     </HBox.margin>
                 </Button>
 
-                <Button cancelButton="true" prefWidth="120.0" text="Cancel">
+                <Button cancelButton="true" onAction="#onCancelButtonAction" prefWidth="120.0" text="Cancel">
                     <HBox.margin>
                         <Insets left="10.0"/>
                     </HBox.margin>

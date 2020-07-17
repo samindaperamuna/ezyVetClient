@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -81,6 +82,15 @@ public class MainController implements Initializable {
     @Getter
     private ContextMenu tableContextMenu;
 
+    @FXML
+    private Button searchButton;
+
+    @FXML
+    private Button previousNavButton;
+
+    @FXML
+    private Button nextNavButton;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(2);
@@ -88,6 +98,8 @@ public class MainController implements Initializable {
 
         addManualAppointmentType();
         addContextMenu();
+
+        Platform.runLater(searchButton::requestFocus);
     }
 
     /**
@@ -246,7 +258,35 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void onNavigationButtonPress(Event event) {
+        cleanDatePicker();
+        LocalDate date = appointmentDatePicker.getValue();
+
+        if (event.getTarget().equals(previousNavButton)) {
+            appointmentDatePicker.setValue(date.plusDays(-1));
+        } else if (event.getTarget().equals(nextNavButton)) {
+            appointmentDatePicker.setValue(date.plusDays(1));
+        }
+
+        onSearchAction();
+    }
+
+    @FXML
     private void onSearchAction() {
+        cleanDatePicker();
+        searchAppointments(appointmentDatePicker.getValue());
+    }
+
+    /**
+     * Requesting date picker value when it's null can cause issues. Hence the value is initialized to today's date.
+     */
+    private void cleanDatePicker() {
+        if (appointmentDatePicker.getValue() == null) {
+            appointmentDatePicker.setValue(LocalDate.now());
+        }
+    }
+
+    private void searchAppointments(LocalDate appointmentDate) {
         toggleDisableMenuItems(true);
 
         ProgressController controller = ProgressHelper.createProgressView(this.stage);
@@ -254,12 +294,6 @@ public class MainController implements Initializable {
 
         // Handles the progress window.
         CountDownLatch progressLatch = new CountDownLatch(1);
-
-        if (appointmentDatePicker.getValue() == null) {
-            appointmentDatePicker.setValue(LocalDate.now());
-        }
-
-        final LocalDate appointmentDate = appointmentDatePicker.getValue();
 
         APIV2 apiv2 = new APIV2();
         Executor executor = Executors.newSingleThreadExecutor();
@@ -294,6 +328,8 @@ public class MainController implements Initializable {
 
                 @Override
                 public void onCompleted(List<AppointmentV2> appointmentList) {
+                    Platform.runLater(appointmentsTable.getColumns()::clear);
+
                     if (!appointmentList.isEmpty()) {
                         APIV1 apiv1 = new APIV1();
                         CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
@@ -351,7 +387,6 @@ public class MainController implements Initializable {
 
                             // Update table data on UI thread.
                             Platform.runLater(() -> {
-                                appointmentsTable.getColumns().clear();
                                 appointmentsTable.getColumns().add(startTime);
                                 appointmentsTable.getColumns().add(description);
                                 appointmentsTable.getColumns().add(animalCode);
