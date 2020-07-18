@@ -92,8 +92,8 @@
                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS"/>
                 </rowConstraints>
-                <Label text="DICOM Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <TextField fx:id="dicomPathText" promptText="Enter DICOM file path." GridPane.columnIndex="3"
+                <Label text="Dump Path" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="dumpPathText" promptText="Enter dump file path." GridPane.columnIndex="3"
                            GridPane.rowIndex="1"/>
                 <Label text="WL Path" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                 <TextField fx:id="wlPathText" promptText="Enter work list file path." GridPane.columnIndex="3"

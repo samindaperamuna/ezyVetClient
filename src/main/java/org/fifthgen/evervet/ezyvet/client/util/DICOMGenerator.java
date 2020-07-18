@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +96,7 @@ public class DICOMGenerator extends FileGenerator {
                         + "(0010,0010) PN [" + ownLast + "^" + aniName + "]" + LINE_END
                         + "(0010,0020) LO [" + aniID + "]" + LINE_END
                         + "(0010,0030) DA [" + aniDOB + "]" + LINE_END
-                        + "(0010,0040) DA [" + aniSex + "]" + LINE_END
+                        + "(0010,0040) CS [" + aniSex + "]" + LINE_END
                         + "(0010,1000) LO [" + aniMicro + "]" + LINE_END
                         + "(0010,1002) SQ" + LINE_END
                         + "(fffe,e000) na" + LINE_END
@@ -109,7 +110,7 @@ public class DICOMGenerator extends FileGenerator {
 
                 if (aniSp.equalsIgnoreCase("Feline")) {
                     content += "(0010,2202) SQ" + LINE_END
-                            + "(0010,2202) " + LINE_END
+                            + "(fffe,e000) " + LINE_END
                             + "(0008,0100) SH [L-80A00]" + LINE_END
                             + "(0008,0102) SH [SRT]" + LINE_END
                             + "(0008,0104) LO [Felis Catis]" + LINE_END
@@ -117,7 +118,7 @@ public class DICOMGenerator extends FileGenerator {
                             + "(fffe,e0dd)" + LINE_END;
                 } else {
                     content += "(0010,2202) SQ" + LINE_END
-                            + "(0010,2202) na" + LINE_END
+                            + "(fffe,e000) " + LINE_END
                             + "(0008,0100) SH [L-80700]" + LINE_END
                             + "(0008,0102) SH [SRT]" + LINE_END
                             + "(0008,0104) LO [Canis Lupis Familiaris]" + LINE_END
@@ -130,13 +131,13 @@ public class DICOMGenerator extends FileGenerator {
                         + "(0010,2297) PN [" + ownTitle + " " + ownLast + " " + aniName + "]" + LINE_END
                         + "(0010,2298) CS [OWNER]" + LINE_END
                         + "(0032,1032) PN [" + ezyVetVet + "]" + LINE_END
-                        + "(0032,1060) SH [" + ezyVetDesc + "]" + LINE_END
+                        + "(0032,1060) LO [" + ezyVetDesc + "]" + LINE_END
                         + "(0040,0100) SQ" + LINE_END
                         + "(fffe,e000) " + LINE_END
 
                         + "(0040,0001) AE [" + ezyVetStation + "]" + LINE_END
                         + "(0040,0002) DA [" + diDate + "]" + LINE_END
-                        + "(0040,0003) DA [" + nowTime + "]" + LINE_END
+                        + "(0040,0003) TM [" + nowTime + "]" + LINE_END
                         + "(0040,1001) SH [" + ezyVetCode + "]" + LINE_END
                         + "(0040,1003) SH [NORMAL]" + LINE_END
                         + "(fffe,e00d)" + LINE_END
@@ -160,13 +161,20 @@ public class DICOMGenerator extends FileGenerator {
         String exec = properties.getProperty(PropertyKey.DICOM_EXEC.getKey());
         String params = properties.getProperty(PropertyKey.DICOM_PARAMS.getKey());
         String dicomPath = file.getPath();
-        String wlPath = properties.getProperty(PropertyKey.WL_PATH.getKey()) + "/" + file.getName().replace(extension, "wl");
+        Path wlPath = Paths.get(properties.getProperty(PropertyKey.WL_PATH.getKey()));
+
+        boolean dirCreated = wlPath.toFile().mkdirs();
+        if (dirCreated) {
+            log.info("New directories were created.");
+        }
+
+        String wlFile = wlPath + "/" + file.getName().replace(extension, "wl");
 
         List<String> commands = new ArrayList<>();
         commands.add(exec);
         commands.addAll(Arrays.asList(params.split(" ")));
         commands.add(dicomPath);
-        commands.add(wlPath);
+        commands.add(wlFile);
 
         Process process = new ProcessBuilder(commands).start();
 

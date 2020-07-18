@@ -34,7 +34,7 @@ public class PreferencesController implements Initializable {
     private TextField imagingDescText;
 
     @FXML
-    private TextField dicomPathText;
+    private TextField dumpPathText;
 
     @FXML
     private TextField wlPathText;
@@ -69,7 +69,7 @@ public class PreferencesController implements Initializable {
         imagingDescText.setText(propertyManager.getProperty(PropertyKey.IMAGING_DESC.getKey()));
 
         // DICOM preferences
-        dicomPathText.setText(propertyManager.getProperty(PropertyKey.DICOM_PATH.getKey()));
+        dumpPathText.setText(propertyManager.getProperty(PropertyKey.DICOM_PATH.getKey()));
         wlPathText.setText(propertyManager.getProperty(PropertyKey.WL_PATH.getKey()));
         dicomExecPath.setText(propertyManager.getProperty(PropertyKey.DICOM_EXEC.getKey()));
         execParamsText.setText(propertyManager.getProperty(PropertyKey.DICOM_PARAMS.getKey()));
@@ -112,7 +112,7 @@ public class PreferencesController implements Initializable {
             propertyManager.setProperty(PropertyKey.IMAGING_DESC.getKey(), imagingDescText.getText());
 
             // DICOM preferences
-            propertyManager.setProperty(PropertyKey.DICOM_PATH.getKey(), dicomPathText.getText());
+            propertyManager.setProperty(PropertyKey.DICOM_PATH.getKey(), dumpPathText.getText());
             propertyManager.setProperty(PropertyKey.WL_PATH.getKey(), wlPathText.getText());
             propertyManager.setProperty(PropertyKey.DICOM_EXEC.getKey(), dicomExecPath.getText());
             propertyManager.setProperty(PropertyKey.DICOM_PARAMS.getKey(), execParamsText.getText());
