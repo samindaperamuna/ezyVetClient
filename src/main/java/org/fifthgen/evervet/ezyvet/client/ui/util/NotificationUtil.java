@@ -17,19 +17,23 @@ public class NotificationUtil {
 
     private static final int FADEOUT_TIME = 5000;
 
+    private static final String STYLE_CLASS_ERR = "notification-error";
+    private static final String STYLE_CLASS_WARN = "notification-warning";
+    private static final String STYLE_CLASS_INFO = "notification-info";
+
     private NotificationUtil() {
     }
 
     public static void notifyError(MainController context, String message) {
-        notifyMessage(context, message, "notification-error");
+        notifyMessage(context, message, STYLE_CLASS_ERR);
     }
 
     public static void notifyWarning(MainController context, String message) {
-        notifyMessage(context, message, "notification-warning");
+        notifyMessage(context, message, STYLE_CLASS_WARN);
     }
 
     public static void notifyInfo(MainController context, String message) {
-        notifyMessage(context, message, "notification-info");
+        notifyMessage(context, message, STYLE_CLASS_INFO);
     }
 
     /**
@@ -42,7 +46,7 @@ public class NotificationUtil {
     private static void notifyMessage(MainController context, String message, String styleClass) {
         Platform.runLater(() -> {
             Label label = context.getNotificationLabel();
-            label.getStyleClass().add("notification-error");
+            label.getStyleClass().add(styleClass);
             label.setText(message);
 
             Timer timer = new Timer();
@@ -50,16 +54,15 @@ public class NotificationUtil {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    Platform.runLater(() -> {
-                        FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), label);
-                        fadeOut.setFromValue(1.0);
-                        fadeOut.setToValue(0.0);
-                        fadeOut.play();
+                    FadeTransition fadeOut = new FadeTransition(Duration.seconds(0.5), label);
+                    fadeOut.setFromValue(1.0);
+                    fadeOut.setToValue(0.0);
+                    fadeOut.play();
 
-                        fadeOut.setOnFinished(actionEvent -> {
-                            label.setText("");
-                            label.getStyleClass().clear();
-                        });
+                    fadeOut.setOnFinished(actionEvent -> {
+                        label.setText("");
+                        label.getStyleClass().clear();
+                        label.setOpacity(1.0);
                     });
                 }
             }, FADEOUT_TIME);

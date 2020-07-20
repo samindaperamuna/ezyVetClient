@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.util.APIHelper;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.util.AtomicProgressCounter;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
@@ -18,6 +19,8 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Log
 public abstract class FileGenerator {
@@ -48,7 +51,8 @@ public abstract class FileGenerator {
     protected Path dirPath;
     protected File file;
 
-    protected StreamReaderCallback callback;
+    protected StreamReaderCallback streamReaderCallback;
+    protected FileWriterCallback fileWriterCallback;
 
     protected FileGenerator() {
         PropertyManager propertyManager = PropertyManager.getInstance();
@@ -57,11 +61,13 @@ public abstract class FileGenerator {
         this.ezyVetCode = propertyManager.getProperty(PropertyKey.IMAGING_CODE.getKey());
     }
 
-    public void generateFile(final Animal animal, StreamReaderCallback callback) {
+    public void generateFile(final Animal animal, StreamReaderCallback streamReaderCallback, FileWriterCallback fileWriterCallback) {
         this.animal = animal;
-        this.callback = callback;
+        this.streamReaderCallback = streamReaderCallback;
+        this.fileWriterCallback = fileWriterCallback;
 
-        new Thread(() -> generateDataProgress(animal)).start();
+        Executor executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> generateDataProgress(animal));
     }
 
     protected void generateDataProgress(Animal animal) {

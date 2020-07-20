@@ -32,11 +32,13 @@ public class XRAYGenerator extends FileGenerator {
                         aniBr + "," + aniMicro + ",RFID,,OWNER,YES";
 
                 Files.writeString(file.toPath(), content);
+                fileWriterCallback.onFileWritten();
                 progressComplete();
             }
         } catch (IOException e) {
             log.severe("Failed to create new file : " + e.getLocalizedMessage());
             progress.setErrorMsg("Failed to create new file");
+            fileWriterCallback.onFileFailed(e);
             progressComplete();
         }
     }

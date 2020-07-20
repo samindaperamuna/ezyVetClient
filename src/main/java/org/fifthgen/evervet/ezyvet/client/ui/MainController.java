@@ -26,6 +26,7 @@ import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentV2Callback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.support.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
 import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
@@ -44,7 +45,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.*;
 
 @Log
-public class MainController implements Initializable {
+public class MainController implements Initializable, FileWriterCallback {
 
     private static final int EXECUTOR_DELAY = 10;
     private static final int REQUEST_UPDATE_DELAY = 30;
@@ -192,7 +193,7 @@ public class MainController implements Initializable {
 
             XRAYGenerator generator = new XRAYGenerator();
             generator.getProgress().setPropertyChangeListener(event -> ProgressHelper.setProgress(this, event));
-            generator.generateFile(appointment.getAnimal(), null);
+            generator.generateFile(appointment.getAnimal(), null, this);
         } else {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this, "Please select a row first!");
@@ -442,6 +443,18 @@ public class MainController implements Initializable {
         if (mnuItmDICOM.isDisable() != disable) {
             mnuItmDICOM.setDisable(disable);
         }
+    }
+
+    @Override
+    public void onFileWritten() {
+        NotificationUtil.notifyInfo(this, "X-RAY file written successfully.");
+    }
+
+    @Override
+    public void onFileFailed(Exception e) {
+        String msg = "Failed to write X-RAY file: " + e.getLocalizedMessage();
+        log.severe(msg);
+        NotificationUtil.notifyError(this, msg);
     }
 
     /**

@@ -13,6 +13,7 @@ import org.fifthgen.evervet.ezyvet.api.callback.GetContactListCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc;
+import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
 import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
@@ -24,7 +25,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 @Log
-public class DICOMController {
+public class DICOMController implements FileWriterCallback {
 
     public Stage stage;
 
@@ -92,7 +93,7 @@ public class DICOMController {
                     log.severe(msg);
                     NotificationUtil.notifyError(parent, msg);
                 }
-            });
+            }, this);
         } else {
             log.warning("Selection empty.");
             NotificationUtil.notifyWarning(this.parent, "Please select a row first!");
@@ -155,5 +156,17 @@ public class DICOMController {
      */
     private void fetchStudyDescriptions() {
         descComboBox.setItems(FXCollections.observableList(Arrays.asList(DICOMDesc.values())));
+    }
+
+    @Override
+    public void onFileWritten() {
+        NotificationUtil.notifyInfo(parent, "DICOM file written successfully.");
+    }
+
+    @Override
+    public void onFileFailed(Exception e) {
+        String msg = "Failed to write DICOM file: " + e.getLocalizedMessage();
+        log.severe(msg);
+        NotificationUtil.notifyError(parent, msg);
     }
 }

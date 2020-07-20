@@ -64,7 +64,6 @@ public class ProgressHelper {
         }
 
         if (progressBar.getProgress() == 1.0) {
-            NotificationUtil.notifyInfo(context, "File generated successfully.");
             fadeOut(context, progressBar);
         }
     }

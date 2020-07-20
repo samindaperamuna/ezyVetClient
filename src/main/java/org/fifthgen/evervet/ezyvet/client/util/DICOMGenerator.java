@@ -10,10 +10,7 @@ import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
 import org.fifthgen.evervet.ezyvet.util.PropertyManager;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -145,12 +142,14 @@ public class DICOMGenerator extends FileGenerator {
 
                 Files.writeString(file.toPath(), content);
                 convertToWorklist();
+                fileWriterCallback.onFileWritten();
                 progressComplete();
             }
         } catch (IOException | InterruptedException e) {
             String msg = "Failed to create new file : " + e.getLocalizedMessage();
             log.severe(msg);
             progress.setErrorMsg(msg);
+            fileWriterCallback.onFileWritten();
             progressComplete();
         }
     }
@@ -168,7 +167,7 @@ public class DICOMGenerator extends FileGenerator {
             log.info("New directories were created.");
         }
 
-        String wlFile = wlPath + "/" + file.getName().replace(extension, "wl");
+        String wlFile = wlPath + File.separator + file.getName().replace(extension, "wl");
 
         List<String> commands = new ArrayList<>();
         commands.add(exec);
@@ -178,8 +177,8 @@ public class DICOMGenerator extends FileGenerator {
 
         Process process = new ProcessBuilder(commands).start();
 
-        readInputStream(process.getErrorStream(), callback, true);
-        readInputStream(process.getInputStream(), callback, false);
+        readInputStream(process.getErrorStream(), streamReaderCallback, true);
+        readInputStream(process.getInputStream(), streamReaderCallback, false);
         process.waitFor();
     }
 
