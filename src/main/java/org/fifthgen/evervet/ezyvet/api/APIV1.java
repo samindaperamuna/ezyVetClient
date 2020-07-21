@@ -72,7 +72,8 @@ public class APIV1 extends APIBase {
 
     public void getAnimalList(GetAnimalListCallback callback) {
         final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
-                + API_VERSION + ANIMAL_PATH);
+                + API_VERSION + ANIMAL_PATH
+                + "?active=1");
         sendAPIRequest(getRequest, TokenScope.READ_ANIMAL, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {
@@ -338,7 +339,8 @@ public class APIV1 extends APIBase {
 
     public void getAppointmentTypeList(GetAppointmentTypeListCallback callback) {
         final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
-                + API_VERSION + APPOINTMENT_TYPE_PATH);
+                + API_VERSION + APPOINTMENT_TYPE_PATH
+                + "?active=1");
         sendAPIRequest(getRequest, TokenScope.READ_APPOINTMENT_TYPE, new ConnectCallback() {
             @Override
             public void onCompleted(HttpResponse response, CountDownLatch latch) {

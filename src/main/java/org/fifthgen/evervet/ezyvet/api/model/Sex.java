@@ -23,5 +23,5 @@ public class Sex {
     private String abbreviation;
 
     @JsonProperty("is_desexed")
-    private boolean isDesexed;
+    private Integer isDesexed;
 }

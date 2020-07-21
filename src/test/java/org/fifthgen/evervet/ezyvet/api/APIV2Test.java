@@ -13,11 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.text.ParseException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,31 +68,11 @@ public class APIV2Test {
     }
 
     @Test
-    public void getAppointmentListTest2() throws ParseException {
+    public void getAppointmentListTest2() {
         AppointmentType type = new AppointmentType();
-        type.setId(1);
+        type.setId(7);
 
-        api.getAppointmentList(type, new GetAppointmentV2Callback() {
-            @Override
-            public void onCompleted(List<AppointmentV2> appointmentList) {
-                Assert.assertNotNull(appointmentList);
-                testContext.log.info("Fetch appointment list complete: " + Arrays.toString(appointmentList.toArray()));
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                exception.expect(Exception.class);
-                testContext.log.severe("Failed to fetch the appointment list: " + e.getLocalizedMessage());
-            }
-        });
-    }
-
-    @Test
-    public void getAppointmentListTest3() throws ParseException {
-        Instant instant = ZonedDateTime.parse("2017-12-14T00:00:00Z").toInstant();
-        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-
-        api.getAppointmentList(date, new GetAppointmentV2Callback() {
+        api.getAppointmentList(type, LocalDate.now(), new GetAppointmentV2Callback() {
             @Override
             public void onCompleted(List<AppointmentV2> appointmentList) {
                 Assert.assertNotNull(appointmentList);

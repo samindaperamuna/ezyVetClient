@@ -40,6 +40,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
@@ -126,6 +127,7 @@ public class MainController implements Initializable, FileWriterCallback {
      */
     private void addManualAppointmentType() {
         AppointmentType type = new AppointmentType();
+        type.setId(7);
         type.setName("Surgery");
         appointmentTypeCombo.getItems().add(type);
         appointmentTypeCombo.getSelectionModel().selectFirst();
@@ -288,8 +290,10 @@ public class MainController implements Initializable, FileWriterCallback {
     }
 
     private void searchAppointments(LocalDate appointmentDate) {
+        NotificationUtil.notifyInfo(this, "This might take a few minutes. Please be patient!");
         toggleDisableMenuItems(true);
 
+        AppointmentType type = appointmentTypeCombo.getSelectionModel().getSelectedItem();
         ProgressController controller = ProgressHelper.createProgressView(this.stage);
         controller.stage.show();
 
@@ -299,7 +303,7 @@ public class MainController implements Initializable, FileWriterCallback {
         APIV2 apiv2 = new APIV2();
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
-            apiv2.getAppointmentList(appointmentDate, new GetAppointmentV2Callback() {
+            apiv2.getAppointmentList(type, appointmentDate, new GetAppointmentV2Callback() {
 
                 /**
                  * Return the table row handler for the <b>order summary</b> table.
@@ -310,12 +314,13 @@ public class MainController implements Initializable, FileWriterCallback {
                 private TableRow<AppointmentV2> tableRow(TableView<AppointmentV2> tableView) {
                     TableRow<AppointmentV2> row = new TableRow<>();
                     row.setOnMouseClicked(event -> {
-                        if (!row.isEmpty()) {
+                        AppointmentV2 appointment = row.getItem();
+
+                        if (!row.isEmpty() && appointment.getAnimal() != null) {
                             toggleDisableMenuItems(false);
 
                             if (event.getButton() == MouseButton.PRIMARY) {
                                 if (event.getClickCount() == 2) {
-                                    AppointmentV2 appointment = row.getItem();
                                     // viewOrder(summary.getOrderId());
                                 }
                             } else if (event.getButton() == MouseButton.SECONDARY) {
@@ -335,33 +340,39 @@ public class MainController implements Initializable, FileWriterCallback {
                         APIV1 apiv1 = new APIV1();
                         CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
 
-                        appointmentList.forEach(appointmentV2 -> apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
-                            @Override
-                            public void onCompleted(Animal animal) {
-                                animalCollectionLatch.countDown();
-                                if (animal != null) {
-                                    appointmentV2.setAnimal(animal);
-                                }
-                            }
+                        for (AppointmentV2 appointmentV2 : appointmentList) {
+                            if (appointmentV2.getAnimalId() != null) {
+                                apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
+                                    @Override
+                                    public void onCompleted(Animal animal) {
+                                        animalCollectionLatch.countDown();
+                                        if (animal != null) {
+                                            appointmentV2.setAnimal(animal);
+                                        }
+                                    }
 
-                            @Override
-                            public void onFailed(Exception e) {
-                                animalCollectionLatch.countDown();
-                                String msg = "Failed to load animal for appointment at: ";
-                                LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
+                                    @Override
+                                    public void onFailed(Exception e) {
+                                        animalCollectionLatch.countDown();
+                                        String msg = "Failed to load animal for appointment at: ";
+                                        LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
 
-                                log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
-                                NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
+                                        log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
+                                        NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
+                                    }
+                                });
                             }
-                        }));
+                        }
 
                         try {
                             animalCollectionLatch.await(REQUEST_UPDATE_DELAY, TimeUnit.SECONDS);
 
                             ObservableList<AppointmentV2> data = FXCollections.observableArrayList(appointmentList);
+                            FXCollections.sort(data, Comparator.comparing(AppointmentV2::getStartAt));
 
                             // Generate the necessary columns.
                             TableColumn<AppointmentV2, Instant> startTime = new TableColumn<>("Start Time");
+                            startTime.setSortType(TableColumn.SortType.DESCENDING);
                             startTime.getStyleClass().add("table-cell-center");
                             startTime.setCellValueFactory(new PropertyValueFactory<>("startAt"));
                             startTime.setCellFactory(TableFactory::timeCell);
@@ -372,19 +383,31 @@ public class MainController implements Initializable, FileWriterCallback {
 
                             TableColumn<AppointmentV2, String> animalCode = new TableColumn<>("Animal Code");
                             animalCode.getStyleClass().add("table-cell-center");
-                            animalCode.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAnimal().getCode()));
+                            animalCode.setCellValueFactory(cellData -> {
+                                Animal animal = cellData.getValue().getAnimal();
+                                return new SimpleStringProperty(animal == null ? "" : animal.getCode());
+                            });
 
                             TableColumn<AppointmentV2, String> animalName = new TableColumn<>("Animal Name");
                             animalName.getStyleClass().add("table-cell-center");
-                            animalName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAnimal().getName()));
+                            animalName.setCellValueFactory(cellData -> {
+                                Animal animal = cellData.getValue().getAnimal();
+                                return new SimpleStringProperty(animal == null ? "" : animal.getName());
+                            });
 
                             TableColumn<AppointmentV2, String> microchipNumber = new TableColumn<>("Microchip Number");
                             microchipNumber.getStyleClass().add("table-cell-center");
-                            microchipNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAnimal().getMicrochipNumber()));
+                            microchipNumber.setCellValueFactory(cellData -> {
+                                Animal animal = cellData.getValue().getAnimal();
+                                return new SimpleStringProperty(animal == null ? "" : animal.getMicrochipNumber());
+                            });
 
                             TableColumn<AppointmentV2, String> notes = new TableColumn<>("Notes");
                             notes.getStyleClass().add("table-cell-center");
-                            notes.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAnimal().getNotes()));
+                            notes.setCellValueFactory(cellData -> {
+                                Animal animal = cellData.getValue().getAnimal();
+                                return new SimpleStringProperty(animal == null ? "" : animal.getNotes());
+                            });
 
                             // Update table data on UI thread.
                             Platform.runLater(() -> {
@@ -394,6 +417,7 @@ public class MainController implements Initializable, FileWriterCallback {
                                 appointmentsTable.getColumns().add(animalName);
                                 appointmentsTable.getColumns().add(microchipNumber);
                                 appointmentsTable.getColumns().add(notes);
+
                                 appointmentsTable.setRowFactory(this::tableRow);
 
                                 appointmentsTable.setItems(data);

@@ -1,5 +1,6 @@
 package org.fifthgen.evervet.ezyvet.api.util;
 
+import lombok.NonNull;
 import lombok.extern.java.Log;
 import org.fifthgen.evervet.ezyvet.api.APIV1;
 import org.fifthgen.evervet.ezyvet.api.callback.*;
@@ -20,7 +21,7 @@ public class APIHelper {
      * @param animal   Animal object.
      * @param progress Progress counter.
      */
-    public static void fetchCompleteAnimalSync(final Animal animal, AtomicProgressCounter progress) {
+    public static void fetchCompleteAnimalSync(@NonNull final Animal animal, AtomicProgressCounter progress) {
         APIV1 api = new APIV1();
         CountDownLatch latch = new CountDownLatch(4);
 

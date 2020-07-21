@@ -1,8 +1,9 @@
 package org.fifthgen.evervet.ezyvet.client.util;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.fifthgen.evervet.ezyvet.api.model.Animal;
+import org.fifthgen.evervet.ezyvet.api.model.*;
 import org.fifthgen.evervet.ezyvet.api.util.APIHelper;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
@@ -43,7 +44,7 @@ public abstract class FileGenerator {
     protected String aniBr;
     protected String aniMicro;
     protected String aniDOB;
-    protected boolean aniNeuter;
+    protected Integer aniNeuter;
     protected double aniWt;
     protected String nowDate;
     protected String nowTime;
@@ -61,7 +62,7 @@ public abstract class FileGenerator {
         this.ezyVetCode = propertyManager.getProperty(PropertyKey.IMAGING_CODE.getKey());
     }
 
-    public void generateFile(final Animal animal, StreamReaderCallback streamReaderCallback, FileWriterCallback fileWriterCallback) {
+    public void generateFile(@NonNull Animal animal, StreamReaderCallback streamReaderCallback, FileWriterCallback fileWriterCallback) {
         this.animal = animal;
         this.streamReaderCallback = streamReaderCallback;
         this.fileWriterCallback = fileWriterCallback;
@@ -70,19 +71,36 @@ public abstract class FileGenerator {
         executor.execute(() -> generateDataProgress(animal));
     }
 
-    protected void generateDataProgress(Animal animal) {
+    protected void generateDataProgress(@NonNull Animal animal) {
         APIHelper.fetchCompleteAnimalSync(animal, this.progress);
 
         aniID = animal.getId();
         aniName = animal.getName();
         ownId = animal.getContactId();
-        ownFirst = animal.getContact().getFirstName();
-        ownLast = animal.getContact().getLastName();
-        aniSp = animal.getSpecies().getName();
-        aniSex = animal.getSex().getAbbreviation();
-        aniBr = animal.getBreed().getName();
+
+        Contact contact = animal.getContact();
+        if (contact != null) {
+            ownFirst = contact.getFirstName();
+            ownLast = contact.getLastName();
+        }
+
+        Species species = animal.getSpecies();
+        if (species != null) {
+            aniSp = species.getName();
+        }
+
+        Sex sex = animal.getSex();
+        if (sex != null) {
+            aniSex = sex.getAbbreviation();
+            aniNeuter = sex.getIsDesexed();
+        }
+
+        Breed breed = animal.getBreed();
+        if (breed != null) {
+            aniBr = breed.getName();
+        }
+
         aniMicro = animal.getMicrochipNumber();
-        aniNeuter = animal.getSex().isDesexed();
         aniWt = animal.getWeight();
 
         aniDOB = "";
