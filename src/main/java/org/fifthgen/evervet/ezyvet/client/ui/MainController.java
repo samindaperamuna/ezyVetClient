@@ -334,6 +334,7 @@ public class MainController implements Initializable, FileWriterCallback {
 
                 @Override
                 public void onCompleted(List<AppointmentV2> appointmentList) {
+                    appointmentList.removeIf(a -> a.getAnimalId() == null);
                     Platform.runLater(appointmentsTable.getColumns()::clear);
 
                     if (!appointmentList.isEmpty()) {
@@ -341,27 +342,25 @@ public class MainController implements Initializable, FileWriterCallback {
                         CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
 
                         for (AppointmentV2 appointmentV2 : appointmentList) {
-                            if (appointmentV2.getAnimalId() != null) {
-                                apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
-                                    @Override
-                                    public void onCompleted(Animal animal) {
-                                        animalCollectionLatch.countDown();
-                                        if (animal != null) {
-                                            appointmentV2.setAnimal(animal);
-                                        }
+                            apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
+                                @Override
+                                public void onCompleted(Animal animal) {
+                                    animalCollectionLatch.countDown();
+                                    if (animal != null) {
+                                        appointmentV2.setAnimal(animal);
                                     }
+                                }
 
-                                    @Override
-                                    public void onFailed(Exception e) {
-                                        animalCollectionLatch.countDown();
-                                        String msg = "Failed to load animal for appointment at: ";
-                                        LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
+                                @Override
+                                public void onFailed(Exception e) {
+                                    animalCollectionLatch.countDown();
+                                    String msg = "Failed to load animal for appointment at: ";
+                                    LocalTime appointmentTime = appointmentV2.getStartAt().atZone(ZoneId.systemDefault()).toLocalTime();
 
-                                        log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
-                                        NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
-                                    }
-                                });
-                            }
+                                    log.severe(msg + appointmentTime + ", \n\r" + e.getLocalizedMessage());
+                                    NotificationUtil.notifyError(MainController.this, msg + appointmentTime);
+                                }
+                            });
                         }
 
                         try {
@@ -375,10 +374,11 @@ public class MainController implements Initializable, FileWriterCallback {
                             startTime.setSortType(TableColumn.SortType.DESCENDING);
                             startTime.getStyleClass().add("table-cell-center");
                             startTime.setCellValueFactory(new PropertyValueFactory<>("startAt"));
+                            startTime.setMinWidth(30.0);
                             startTime.setCellFactory(TableFactory::timeCell);
 
                             TableColumn<AppointmentV2, String> description = new TableColumn<>("Description");
-                            description.getStyleClass().add("table-cell-center");
+                            description.getStyleClass().add("table-cell-left");
                             description.setCellValueFactory(new PropertyValueFactory<>("description"));
 
                             TableColumn<AppointmentV2, String> animalCode = new TableColumn<>("Animal Code");
@@ -402,12 +402,12 @@ public class MainController implements Initializable, FileWriterCallback {
                                 return new SimpleStringProperty(animal == null ? "" : animal.getMicrochipNumber());
                             });
 
-                            TableColumn<AppointmentV2, String> notes = new TableColumn<>("Notes");
-                            notes.getStyleClass().add("table-cell-center");
-                            notes.setCellValueFactory(cellData -> {
-                                Animal animal = cellData.getValue().getAnimal();
-                                return new SimpleStringProperty(animal == null ? "" : animal.getNotes());
-                            });
+//                            TableColumn<AppointmentV2, String> notes = new TableColumn<>("Notes");
+//                            notes.getStyleClass().add("table-cell-center");
+//                            notes.setCellValueFactory(cellData -> {
+//                                Animal animal = cellData.getValue().getAnimal();
+//                                return new SimpleStringProperty(animal == null ? "" : animal.getNotes());
+//                            });
 
                             // Update table data on UI thread.
                             Platform.runLater(() -> {
@@ -416,7 +416,7 @@ public class MainController implements Initializable, FileWriterCallback {
                                 appointmentsTable.getColumns().add(animalCode);
                                 appointmentsTable.getColumns().add(animalName);
                                 appointmentsTable.getColumns().add(microchipNumber);
-                                appointmentsTable.getColumns().add(notes);
+                                // appointmentsTable.getColumns().add(notes);
 
                                 appointmentsTable.setRowFactory(this::tableRow);
 

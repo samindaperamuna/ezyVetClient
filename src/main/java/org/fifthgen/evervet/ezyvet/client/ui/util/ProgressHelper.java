@@ -84,6 +84,20 @@ public class ProgressHelper {
             progressStage.initModality(Modality.APPLICATION_MODAL);
             progressStage.initStyle(StageStyle.UNDECORATED);
 
+            // Calculate the center position of the parent Stage
+            double centerXPosition = stage.getX() + stage.getWidth() / 2d;
+            double centerYPosition = stage.getY() + stage.getHeight() * 3 / 5d;
+
+            // Hide the pop-up stage before it is shown and becomes relocated
+            progressStage.setOnShowing(ev -> progressStage.hide());
+
+            // Relocate the pop-up Stage
+            progressStage.setOnShown(ev -> {
+                progressStage.setX(centerXPosition - progressStage.getWidth() / 2d);
+                progressStage.setY(centerYPosition - progressStage.getHeight() * 3 / 5d);
+                progressStage.show();
+            });
+
             controller.stage = progressStage;
         } catch (IOException e) {
             log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());

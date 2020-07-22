@@ -28,6 +28,10 @@
     -fx-alignment: center;
 }
 
+.table-cell-left {
+    -fx-alignment: center-left;
+}
+
 .notification-error {
     -fx-text-fill: 'red';
 }
