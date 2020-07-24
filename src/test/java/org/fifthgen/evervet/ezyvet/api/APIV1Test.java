@@ -184,6 +184,23 @@ public class APIV1Test {
     }
 
     @Test
+    public void getResourceTest() {
+        api.getResource(RESOURCE_ID, new GetResourceCallback() {
+            @Override
+            public void onCompleted(Resource resource) {
+                Assert.assertNotNull(resource);
+                testContext.log.info("Fetch resource complete : " + resource.toString());
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                exception.expect(Exception.class);
+                testContext.log.severe("Failed to fetch resource: " + e.getLocalizedMessage());
+            }
+        });
+    }
+
+    @Test
     public void getAppointmentTypeListTest() {
         api.getAppointmentTypeList(new GetAppointmentTypeListCallback() {
             @Override

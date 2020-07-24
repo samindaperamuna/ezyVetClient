@@ -26,7 +26,9 @@ public class APIV1 extends APIBase {
     private static final String BREED_PATH = "/breed";
     private static final String CONTACT_PATH = "/contact";
     private static final String ADDRESS_PATH = "/address";
+    public static final int PRAHRAN_SURGERY_OWNER_ID = 12;
     private static final String APPOINTMENT_TYPE_PATH = "/appointmenttype";
+    private static final String RESOURCE_PATH = "/resource";
 
     public APIV1() {
         super.log = Logger.getLogger(getClass().getName());
@@ -322,6 +324,44 @@ public class APIV1 extends APIBase {
                     callback.onCompleted(addresses.get(0));
                 } catch (IOException e) {
                     String msg = "Couldn't convert response into an address object.";
+                    log.severe(msg + ": \n" + e.getLocalizedMessage());
+                    callback.onFailed(e);
+                } finally {
+                    latch.countDown();
+                }
+            }
+
+            @Override
+            public void onFailed(Exception e) {
+                log.severe("Exception in request: \n" + e.getLocalizedMessage());
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    public void getResource(int resourceId, GetResourceCallback callback) {
+        final HttpGet getRequest = new HttpGet(PropertyManager.getInstance().getProperty(PropertyKey.API_URL.getKey())
+                + API_VERSION + RESOURCE_PATH
+                + "?id=" + resourceId);
+        sendAPIRequest(getRequest, TokenScope.READ_RESOURCE, new ConnectCallback() {
+            @Override
+            public void onCompleted(HttpResponse response, CountDownLatch latch) {
+                HttpEntity entity = response.getEntity();
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+
+                try {
+                    JsonNode node = mapper.readTree(EntityUtils.toString(entity));
+                    JsonNode itemsNode = node.path("items");
+
+                    List<Resource> resources = new ArrayList<>();
+                    for (JsonNode itemNode : itemsNode) {
+                        resources.add(mapper.readerFor(Resource.class).readValue(itemNode.get("resource")));
+                    }
+
+                    callback.onCompleted(resources.get(0));
+                } catch (IOException e) {
+                    String msg = "Couldn't convert response into a resource object.";
                     log.severe(msg + ": \n" + e.getLocalizedMessage());
                     callback.onFailed(e);
                 } finally {

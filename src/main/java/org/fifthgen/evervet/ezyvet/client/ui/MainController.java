@@ -23,9 +23,11 @@ import org.fifthgen.evervet.ezyvet.api.APIV2;
 import org.fifthgen.evervet.ezyvet.api.callback.GetAnimalCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentTypeListCallback;
 import org.fifthgen.evervet.ezyvet.api.callback.GetAppointmentV2Callback;
+import org.fifthgen.evervet.ezyvet.api.callback.GetResourceCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentType;
 import org.fifthgen.evervet.ezyvet.api.model.AppointmentV2;
+import org.fifthgen.evervet.ezyvet.api.model.Resource;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.support.TableFactory;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
@@ -40,6 +42,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -335,13 +338,46 @@ public class MainController implements Initializable, FileWriterCallback {
                 @Override
                 public void onCompleted(List<AppointmentV2> appointmentList) {
                     appointmentList.removeIf(a -> a.getAnimalId() == null);
+                    List<AppointmentV2> surgeryAppointments = new ArrayList<>();
                     Platform.runLater(appointmentsTable.getColumns()::clear);
 
                     if (!appointmentList.isEmpty()) {
                         APIV1 apiv1 = new APIV1();
-                        CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
+
+                        CountDownLatch resourceLatch = new CountDownLatch(appointmentList.size());
 
                         for (AppointmentV2 appointmentV2 : appointmentList) {
+                            Resource[] resources = appointmentV2.getResources();
+                            if (resources.length > 0) {
+                                Resource res = resources[0];
+                                apiv1.getResource(res.getId(), new GetResourceCallback() {
+                                    @Override
+                                    public void onCompleted(Resource resource) {
+                                        if (resource.getOwnershipId() == APIV1.PRAHRAN_SURGERY_OWNER_ID) {
+                                            surgeryAppointments.add(appointmentV2);
+                                        }
+
+                                        resourceLatch.countDown();
+                                    }
+
+                                    @Override
+                                    public void onFailed(Exception e) {
+                                        log.warning("Failed to fetch resource info for resource: " + res.getId());
+                                        resourceLatch.countDown();
+                                    }
+                                });
+                            }
+                        }
+
+                        try {
+                            resourceLatch.await(REQUEST_UPDATE_DELAY, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            log.warning("Failed to release countdown latch: " + e.getLocalizedMessage());
+                        }
+
+                        CountDownLatch animalCollectionLatch = new CountDownLatch(appointmentList.size());
+
+                        for (AppointmentV2 appointmentV2 : surgeryAppointments) {
                             apiv1.getAnimal(appointmentV2.getAnimalId(), new GetAnimalCallback() {
                                 @Override
                                 public void onCompleted(Animal animal) {
@@ -366,7 +402,7 @@ public class MainController implements Initializable, FileWriterCallback {
                         try {
                             animalCollectionLatch.await(REQUEST_UPDATE_DELAY, TimeUnit.SECONDS);
 
-                            ObservableList<AppointmentV2> data = FXCollections.observableArrayList(appointmentList);
+                            ObservableList<AppointmentV2> data = FXCollections.observableArrayList(surgeryAppointments);
                             FXCollections.sort(data, Comparator.comparing(AppointmentV2::getStartAt));
 
                             // Generate the necessary columns.
