@@ -8,11 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
-import org.fifthgen.evervet.ezyvet.api.APIV1;
-import org.fifthgen.evervet.ezyvet.api.callback.GetContactListCallback;
 import org.fifthgen.evervet.ezyvet.api.model.Animal;
-import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc;
+import org.fifthgen.evervet.ezyvet.api.model.VETDesc;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.FileWriterCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.client.ui.util.NotificationUtil;
@@ -20,9 +18,6 @@ import org.fifthgen.evervet.ezyvet.client.ui.util.ProgressHelper;
 import org.fifthgen.evervet.ezyvet.client.util.DICOMGenerator;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @Log
 public class DICOMController implements FileWriterCallback {
@@ -33,7 +28,7 @@ public class DICOMController implements FileWriterCallback {
     private Animal animal;
 
     @FXML
-    private ComboBox<Contact> vetComboBox;
+    private ComboBox<VETDesc> vetComboBox;
 
     @FXML
     private ComboBox<DICOMDesc> descComboBox;
@@ -54,7 +49,7 @@ public class DICOMController implements FileWriterCallback {
         if (!vetComboBox.getSelectionModel().isEmpty() && !descComboBox.getSelectionModel().isEmpty()) {
             disableControls(true);
 
-            Contact vet = vetComboBox.getValue();
+            VETDesc vet = vetComboBox.getValue();
             DICOMDesc desc = descComboBox.getValue();
 
             ProgressHelper.initProgressBar(parent);
@@ -105,39 +100,6 @@ public class DICOMController implements FileWriterCallback {
         stage.close();
     }
 
-    /**
-     * Fetch the active vets from the API. Does this on a background thread to prevent locking of the UI thread.
-     */
-    private void fetchActiveVets() {
-        ProgressController progress = ProgressHelper.createProgressView(this.parent.stage);
-        progress.stage.show();
-
-        APIV1 api = new APIV1();
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> api.getContactList(true, true, new GetContactListCallback() {
-            @Override
-            public void onCompleted(List<Contact> contactList) {
-                Platform.runLater(() -> vetComboBox.setItems(FXCollections.observableList(contactList)));
-
-                Platform.runLater(() -> {
-                    progress.stage.close();
-                    stage.show();
-                });
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                String msg = "Failed to fetch active vets";
-                log.severe(msg + " :" + e.getLocalizedMessage());
-
-                Platform.runLater(() -> {
-                    progress.stage.close();
-                    stage.close();
-                });
-            }
-        }));
-    }
-
     @FXML
     private void onSelectionChanged() {
         if (!vetComboBox.getSelectionModel().isEmpty() && !descComboBox.getSelectionModel().isEmpty()) {
@@ -156,6 +118,10 @@ public class DICOMController implements FileWriterCallback {
      */
     private void fetchStudyDescriptions() {
         descComboBox.setItems(FXCollections.observableList(Arrays.asList(DICOMDesc.values())));
+    }
+
+    private void fetchActiveVets() {
+        vetComboBox.setItems(FXCollections.observableList(Arrays.asList(VETDesc.values())));
     }
 
     @Override

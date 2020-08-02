@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -109,7 +108,7 @@ public abstract class FileGenerator {
         if (dobInst != null) {
             aniDOB = dobInst.atZone(ZoneId.systemDefault())
                     .toLocalDate()
-                    .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
         nowDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);

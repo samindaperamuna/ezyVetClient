@@ -227,6 +227,7 @@ public class MainController implements Initializable, FileWriterCallback {
                 dicomStage.setResizable(false);
                 dicomStage.initModality(Modality.APPLICATION_MODAL);
                 dicomStage.initStyle(StageStyle.UNIFIED);
+                dicomStage.show();
             } catch (IOException e) {
                 log.severe("Couldn't load FXML file: " + e.getLocalizedMessage());
             }
@@ -438,13 +439,6 @@ public class MainController implements Initializable, FileWriterCallback {
                                 return new SimpleStringProperty(animal == null ? "" : animal.getMicrochipNumber());
                             });
 
-//                            TableColumn<AppointmentV2, String> notes = new TableColumn<>("Notes");
-//                            notes.getStyleClass().add("table-cell-center");
-//                            notes.setCellValueFactory(cellData -> {
-//                                Animal animal = cellData.getValue().getAnimal();
-//                                return new SimpleStringProperty(animal == null ? "" : animal.getNotes());
-//                            });
-
                             // Update table data on UI thread.
                             Platform.runLater(() -> {
                                 appointmentsTable.getColumns().add(startTime);
@@ -452,7 +446,6 @@ public class MainController implements Initializable, FileWriterCallback {
                                 appointmentsTable.getColumns().add(animalCode);
                                 appointmentsTable.getColumns().add(animalName);
                                 appointmentsTable.getColumns().add(microchipNumber);
-                                // appointmentsTable.getColumns().add(notes);
 
                                 appointmentsTable.setRowFactory(this::tableRow);
 

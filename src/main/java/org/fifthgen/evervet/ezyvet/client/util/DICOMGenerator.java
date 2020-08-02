@@ -5,6 +5,7 @@ import org.fifthgen.evervet.ezyvet.api.model.Address;
 import org.fifthgen.evervet.ezyvet.api.model.Contact;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc;
 import org.fifthgen.evervet.ezyvet.api.model.DICOMDesc.Modality;
+import org.fifthgen.evervet.ezyvet.api.model.VETDesc;
 import org.fifthgen.evervet.ezyvet.api.util.APIHelper;
 import org.fifthgen.evervet.ezyvet.client.ui.callback.StreamReaderCallback;
 import org.fifthgen.evervet.ezyvet.util.PropertyKey;
@@ -25,14 +26,14 @@ public class DICOMGenerator extends FileGenerator {
 
     private static final String LINE_END = System.getProperty("line.separator");
 
-    private final Contact ezyVetVet;
+    private final VETDesc ezyVetVet;
     private final Modality ezyVetModality;
 
     private String ownAdd;
     private String ownSub;
     private String ownPCode;
 
-    public DICOMGenerator(DICOMDesc dicomDesc, Contact ezyVetVet) {
+    public DICOMGenerator(DICOMDesc dicomDesc, VETDesc ezyVetVet) {
         PropertyManager propertyManager = PropertyManager.getInstance();
         dirPath = Paths.get(propertyManager.getProperty(PropertyKey.DICOM_PATH.getKey()));
 
@@ -75,7 +76,7 @@ public class DICOMGenerator extends FileGenerator {
         if (ezyVetModality == Modality.US) {
             ezyVetStation = "MYLAB";
         } else {
-            ezyVetStation = "METRON_Ae";
+            ezyVetStation = "METRON_AE";
         }
 
         try {
@@ -102,11 +103,10 @@ public class DICOMGenerator extends FileGenerator {
                         + "(fffe,e00d)" + LINE_END
                         + "(fffe,e0dd)" + LINE_END
                         + "(0010,1030) DS [" + aniWt + "]" + LINE_END
-                        + "(0010,1040) LO [" + ownAdd + " " + ownSub + " " + ownPCode + "]" + LINE_END
-                        + "(0010,2201) LO [" + aniSp.toUpperCase() + "]" + LINE_END;
-
+                        + "(0010,1040) LO [682 Malvern Road Prahran Victoria 3181]" + LINE_END;
                 if (aniSp.equalsIgnoreCase("Feline")) {
-                    content += "(0010,2202) SQ" + LINE_END
+                    content += "(0010,2201) LO [FELINE]" + LINE_END
+                            + "(0010,2202) SQ" + LINE_END
                             + "(fffe,e000) " + LINE_END
                             + "(0008,0100) SH [L-80A00]" + LINE_END
                             + "(0008,0102) SH [SRT]" + LINE_END
@@ -114,7 +114,8 @@ public class DICOMGenerator extends FileGenerator {
                             + "(fffe,e00d)" + LINE_END
                             + "(fffe,e0dd)" + LINE_END;
                 } else {
-                    content += "(0010,2202) SQ" + LINE_END
+                    content += "(0010,2201) LO [CANINE]" + LINE_END
+                            + "(0010,2202) SQ" + LINE_END
                             + "(fffe,e000) " + LINE_END
                             + "(0008,0100) SH [L-80700]" + LINE_END
                             + "(0008,0102) SH [SRT]" + LINE_END
@@ -133,9 +134,10 @@ public class DICOMGenerator extends FileGenerator {
                         + "(fffe,e000) " + LINE_END
 
                         + "(0040,0001) AE [" + ezyVetStation + "]" + LINE_END
+                        + "(0008,0060) CS [" + ezyVetModality + "]" + LINE_END
                         + "(0040,0002) DA [" + diDate + "]" + LINE_END
                         + "(0040,0003) TM [" + nowTime + "]" + LINE_END
-                        + "(0040,1001) SH [" + ezyVetCode + "]" + LINE_END
+                        + "(0040,1001) SH [" + ezyVetDesc + "]" + LINE_END
                         + "(0040,1003) SH [NORMAL]" + LINE_END
                         + "(fffe,e00d)" + LINE_END
                         + "(fffe,e0dd)" + LINE_END;
